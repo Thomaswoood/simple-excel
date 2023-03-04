@@ -1,4 +1,4 @@
-package com.thomas.alib.excel.exception.base;
+package com.thomas.alib.excel.base;
 
 import com.thomas.alib.excel.annotation.ExcelColumn;
 import com.thomas.alib.excel.converter.*;

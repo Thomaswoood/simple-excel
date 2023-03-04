@@ -1,6 +1,6 @@
 package com.thomas.alib.excel.exporter;
 
-import com.thomas.alib.excel.exception.base.ExcelColumnRender;
+import com.thomas.alib.excel.base.ExcelColumnRender;
 import com.thomas.alib.excel.converter.DefaultConverter;
 
 import java.lang.reflect.Field;

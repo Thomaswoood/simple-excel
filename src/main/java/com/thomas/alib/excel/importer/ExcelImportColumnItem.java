@@ -1,6 +1,6 @@
 package com.thomas.alib.excel.importer;
 
-import com.thomas.alib.excel.exception.base.ExcelColumnRender;
+import com.thomas.alib.excel.base.ExcelColumnRender;
 import com.thomas.alib.excel.exception.AnalysisException;
 import com.thomas.alib.excel.utils.StringUtils;
 import org.apache.poi.ss.formula.eval.NotImplementedException;
