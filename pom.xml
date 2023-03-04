@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.thomas.alib</groupId>
+    <artifactId>simple-excel</artifactId>
+    <version>1.0.0</version>
+    <name>simple-excel</name>
+    <description>简单excel导入导出工具，基于Apache.poi实现，通过注解方式实现poi常用api的调用</description>
+
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+        <!--poi excel-->
+        <poi.version>5.2.3</poi.version>
+        <!-- javax参数校验 -->
+        <javax.validation-api.version>2.0.1.Final</javax.validation-api.version>
+        <!--javax-servlet-->
+        <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
+        <!--日志-->
+        <slf4j.version>1.7.36</slf4j.version>
+    </properties>
+
+    <dependencies>
+        <!--excel-->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>${poi.version}</version>
+        </dependency>
+        <!-- javax参数校验 -->
+        <dependency>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
+            <version>${javax.validation-api.version}</version>
+            <optional>true</optional>
+        </dependency>
+        <!--javax-servlet-->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>${javax.servlet-api.version}</version>
+            <optional>true</optional>
+        </dependency>
+        <!--日志-->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
+
+</project>
