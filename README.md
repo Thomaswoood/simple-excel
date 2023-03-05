@@ -5,7 +5,7 @@
 > 安装-Maven
 ```
 <dependency>
-    <groupId>com.thomas.alib</groupId>
+    <groupId>io.github.Thomaswoood</groupId>
     <artifactId>simple-excel</artifactId>
     <version>1.0.0</version>
 </dependency>
