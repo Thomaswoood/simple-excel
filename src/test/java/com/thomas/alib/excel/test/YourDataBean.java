@@ -20,9 +20,50 @@ public class YourDataBean {
     private String userName;
     @ExcelColumn(headerName = "出生日期", orderNum = 2, columnWidth = 6000, converter = LocalDateConverter.class)
     private LocalDate birthDay;
-    @ExcelColumn(headerName = "性别 0男 1女", orderNum = 3, columnWidth = 1300, beforeConvert = {"0", "1"}, afterConvert = {"男", "女"})
+    @ExcelColumn(headerName = "性别", orderNum = 3, columnWidth = 2000, beforeConvert = {"0", "1"}, afterConvert = {"男", "女"})
     private Integer gender;
-    @ExcelColumn(headerName = "头像", orderNum = 4, columnWidth = 3800, isPicture = true)
+    @ExcelColumn(headerName = "头像", orderNum = 4, columnWidth = 4500, isPicture = true)
     private String headPicture;
 
+    public YourDataBean() {
+    }
+
+    public YourDataBean(String userName, LocalDate birthDay, Integer gender, String headPicture) {
+        this.userName = userName;
+        this.birthDay = birthDay;
+        this.gender = gender;
+        this.headPicture = headPicture;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public LocalDate getBirthDay() {
+        return birthDay;
+    }
+
+    public void setBirthDay(LocalDate birthDay) {
+        this.birthDay = birthDay;
+    }
+
+    public Integer getGender() {
+        return gender;
+    }
+
+    public void setGender(Integer gender) {
+        this.gender = gender;
+    }
+
+    public String getHeadPicture() {
+        return headPicture;
+    }
+
+    public void setHeadPicture(String headPicture) {
+        this.headPicture = headPicture;
+    }
 }

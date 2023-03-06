@@ -24,9 +24,20 @@ public class ExcelExporterFile extends ExcelExporterBase<ExcelExporterFile> {
 
     @Override
     OutputStream getOutputStream() throws Exception {
+        //没传入文件，默认在临时文件夹处理
         if (file == null) {
             file = new File(System.getProperty("java.io.tmpdir"), System.currentTimeMillis() + ".xlsx");
         }
+        //检查指定文件目录是否存在，不存在则创建
+        File parent = file.getParentFile();
+        if (!parent.exists()) {
+            parent.mkdirs();
+        }
+        //检查文件是否存在，存在先删除，再生成
+        if (file.exists()) {
+            file.delete();
+        }
+        file.createNewFile();
         return Files.newOutputStream(file.toPath());
     }
 }

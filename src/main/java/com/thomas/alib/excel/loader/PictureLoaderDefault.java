@@ -23,13 +23,14 @@ public class PictureLoaderDefault implements PictureLoader<String> {
     @Override
     public byte[] loadPicture(String s) throws IOException {
         if (StringUtils.isNotBlank(s) && !StringUtils.equals(s, "null")) {
+            //加载网络图片到
+            URL url = new URL(s);
+            URLConnection conn = url.openConnection();
+            try (InputStream inputStream = conn.getInputStream()) {
+                return IOUtils.toByteArray(inputStream);
+            }
+        } else {
             return null;
-        }
-        //加载网络图片到
-        URL url = new URL(s);
-        URLConnection conn = url.openConnection();
-        try (InputStream inputStream = conn.getInputStream()) {
-            return IOUtils.toByteArray(inputStream);
         }
     }
 }
