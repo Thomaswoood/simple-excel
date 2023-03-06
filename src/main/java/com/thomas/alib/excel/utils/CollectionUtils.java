@@ -1,6 +1,5 @@
 package com.thomas.alib.excel.utils;
 
-import com.sun.istack.internal.Nullable;
 
 import java.util.Collection;
 import java.util.Map;
@@ -16,7 +15,7 @@ public class CollectionUtils {
      * @param collection 集合对象
      * @return 是否为空
      */
-    public static boolean isEmpty(@Nullable Collection<?> collection) {
+    public static boolean isEmpty(Collection<?> collection) {
         return collection == null || collection.isEmpty();
     }
 
@@ -26,7 +25,7 @@ public class CollectionUtils {
      * @param map map对象
      * @return 是否为空
      */
-    public static boolean isEmpty(@Nullable Map<?, ?> map) {
+    public static boolean isEmpty(Map<?, ?> map) {
         return map == null || map.isEmpty();
     }
 
@@ -36,7 +35,7 @@ public class CollectionUtils {
      * @param collection 集合对象
      * @return 是否不为空
      */
-    public static boolean isNotEmpty(@Nullable Collection<?> collection) {
+    public static boolean isNotEmpty(Collection<?> collection) {
         return !isEmpty(collection);
     }
 
@@ -46,7 +45,7 @@ public class CollectionUtils {
      * @param map map对象
      * @return 是否不为空
      */
-    public static boolean isNotEmpty(@Nullable Map<?, ?> map) {
+    public static boolean isNotEmpty(Map<?, ?> map) {
         return !isEmpty(map);
     }
 }
