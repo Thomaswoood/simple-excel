@@ -63,7 +63,7 @@ class ExcelImportSheetItem<T> {
                     throw new RuntimeException("表格第" + row_index + "行:" + e.getLocalizedMessage());
                 } else {
                     e.printStackTrace();
-                    throw new RuntimeException("表格第" + row_index + "行:解析时发生未知错误，请联系管理员");
+                    throw new RuntimeException("表格第" + row_index + "行:解析时发生未知错误，请联系管理员", e);
                 }
             }
             Set<ConstraintViolation<@Valid T>> validateSet = Validation.buildDefaultValidatorFactory()

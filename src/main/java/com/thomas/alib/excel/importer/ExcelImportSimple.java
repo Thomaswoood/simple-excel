@@ -3,8 +3,6 @@ package com.thomas.alib.excel.importer;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.InputStream;
@@ -16,7 +14,6 @@ import java.util.function.BiConsumer;
  * Excel导入工具类
  */
 public class ExcelImportSimple {
-    static Logger logger = LoggerFactory.getLogger(ExcelImportSimple.class);
 
     /**
      * 读取excel文件总行数
@@ -29,8 +26,7 @@ public class ExcelImportSimple {
         try {
             wb = WorkbookFactory.create(inputStream);
         } catch (Exception e) {
-            logger.error("文件读取失败", e);
-            throw new RuntimeException("文件读取失败");
+            throw new RuntimeException("文件读取失败", e);
         }
         return getTotalLineCount(wb);
     }
@@ -46,8 +42,7 @@ public class ExcelImportSimple {
         try {
             wb = WorkbookFactory.create(file);
         } catch (Exception e) {
-            logger.error("文件读取失败", e);
-            throw new RuntimeException("文件读取失败");
+            throw new RuntimeException("文件读取失败", e);
         }
         return getTotalLineCount(wb);
     }
@@ -85,8 +80,7 @@ public class ExcelImportSimple {
         try {
             wb = WorkbookFactory.create(inputStream);
         } catch (Exception e) {
-            logger.error("文件读取失败", e);
-            throw new RuntimeException("文件读取失败");
+            throw new RuntimeException("文件读取失败", e);
         }
         return readList(wb, clazz);
     }
@@ -104,8 +98,7 @@ public class ExcelImportSimple {
         try {
             wb = WorkbookFactory.create(file);
         } catch (Exception e) {
-            logger.error("文件读取失败", e);
-            throw new RuntimeException("文件读取失败");
+            throw new RuntimeException("文件读取失败", e);
         }
         return readList(wb, clazz);
     }
@@ -171,9 +164,8 @@ public class ExcelImportSimple {
         try {
             wb = WorkbookFactory.create(inputStream);
         } catch (Exception e) {
-            result.appendMsg("文件读取失败;");
+            result.appendMsg("文件读取失败;" + e.getLocalizedMessage());
             result.setReadSuccess(false);
-            logger.error("文件读取失败", e);
             return result;
         }
         return readListSafety(wb, clazz, consumer, result);
@@ -195,9 +187,8 @@ public class ExcelImportSimple {
         try {
             wb = WorkbookFactory.create(file);
         } catch (Exception e) {
-            result.appendMsg("文件读取失败;");
+            result.appendMsg("文件读取失败;" + e.getLocalizedMessage());
             result.setReadSuccess(false);
-            logger.error("文件读取失败", e);
             return result;
         }
         return readListSafety(wb, clazz, consumer, result);

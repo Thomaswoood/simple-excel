@@ -21,7 +21,7 @@
         <!--javax-servlet-->
         <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
         <!--日志-->
-        <slf4j.version>1.7.36</slf4j.version>
+        <logger.version>2.11.1</logger.version>
     </properties>
 
     <repositories>
@@ -60,9 +60,9 @@
         </dependency>
         <!--日志-->
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>${logger.version}</version>
             <optional>true</optional>
         </dependency>
     </dependencies>

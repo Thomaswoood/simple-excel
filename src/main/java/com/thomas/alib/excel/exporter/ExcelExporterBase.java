@@ -165,7 +165,7 @@ public abstract class ExcelExporterBase<C extends ExcelExporterBase<C>> {
             os = getOutputStream();
             sxssfWorkbook.write(getOutputStream());
         } catch (Exception e) {
-            throw new RuntimeException("导出失败");
+            throw new RuntimeException("导出失败", e);
         } finally {
             try {
                 if (os != null) {
