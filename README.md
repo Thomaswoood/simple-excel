@@ -8,7 +8,7 @@
 <dependency>
     <groupId>io.github.Thomaswoood</groupId>
     <artifactId>simple-excel</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 ```
 
