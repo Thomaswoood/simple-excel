@@ -15,9 +15,11 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <!--poi excel-->
-        <poi.version>5.2.3</poi.version>
+        <poi.version>4.1.2</poi.version>
         <!-- javax参数校验 -->
         <javax.validation-api.version>2.0.1.Final</javax.validation-api.version>
+        <org.hibernate.validator.version>6.1.6.Final</org.hibernate.validator.version>
+        <javax.el.version>3.0.0</javax.el.version>
         <!--javax-servlet-->
         <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
         <!--日志-->
@@ -49,6 +51,18 @@
             <groupId>javax.validation</groupId>
             <artifactId>validation-api</artifactId>
             <version>${javax.validation-api.version}</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>${org.hibernate.validator.version}</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.el</artifactId>
+            <version>${javax.el.version}</version>
             <optional>true</optional>
         </dependency>
         <!--javax-servlet-->

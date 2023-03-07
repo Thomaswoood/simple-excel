@@ -11,7 +11,7 @@ import com.thomas.alib.excel.enums.VerAlignment;
 
 import java.time.LocalDate;
 
-@ExcelSheet(sheetName = "YourDataBean示例", showIndex = false)
+@ExcelSheet(sheetName = "YourDataBean示例", showIndex = false, dataRowHeight = 3000)
 @ExcelExportHeadStyle(fontName = "宋体", textSize = 12, isBold = true, horAlignment = HorAlignment.CENTER, verAlignment = VerAlignment.CENTER, isWrapText = true, fourSideBorder = BorderType.THIN)
 @ExcelExportDataStyle(fontName = "宋体", textSize = 10, horAlignment = HorAlignment.CENTER, verAlignment = VerAlignment.CENTER, isWrapText = true, fourSideBorder = BorderType.THIN)
 public class YourDataBean {

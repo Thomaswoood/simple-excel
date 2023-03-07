@@ -2,6 +2,7 @@ package com.thomas.alib.excel.exporter;
 
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 
@@ -38,6 +39,6 @@ public class ExcelExporterFile extends ExcelExporterBase<ExcelExporterFile> {
             file.delete();
         }
         file.createNewFile();
-        return Files.newOutputStream(file.toPath());
+        return new FileOutputStream(file);
     }
 }

@@ -6,6 +6,7 @@ import com.thomas.alib.excel.utils.CollectionUtils;
 import com.thomas.alib.excel.utils.ReflectUtil;
 import com.thomas.alib.excel.utils.StringUtils;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFClientAnchor;
 
 import java.lang.reflect.Field;
@@ -176,10 +177,12 @@ class ExcelExportSheetItem<T> {
                             if (pictureBytes == null) {
                                 cell.setCellValue("图片： " + column.getColumnValueFromSource(item_source) + "  加载失败");
                             } else {
-                                int addPicture = workbook.addPicture(pictureBytes, workbook.PICTURE_TYPE_PNG);
-                                Drawing drawing = sheet.createDrawingPatriarch();
-                                ClientAnchor clientAnchor = new XSSFClientAnchor(0, 0, 0, 0, r_i, i + 1, r_i + 1, i + 2);
+                                Drawing drawing = sheet.getDrawingPatriarch();
+                                if (drawing == null)  drawing = sheet.createDrawingPatriarch();
+                                ClientAnchor clientAnchor = drawing.createAnchor(0, 0, 0, 0, r_i, i + 1, r_i + 1, i + 2);
+                                int addPicture = workbook.addPicture(pictureBytes, SXSSFWorkbook.PICTURE_TYPE_JPEG);
                                 Picture picture = drawing.createPicture(clientAnchor, addPicture);
+                                picture.getPictureData();
                             }
                         } catch (Throwable e) {
                             cell.setCellValue("图片： " + column.getColumnValueFromSource(item_source) + "  获取失败");
