@@ -23,9 +23,9 @@ public class YourDataBean {
     private String userName;
     @ExcelColumn(headerName = "出生日期", orderNum = 2, columnWidth = 6000, converter = LocalDateConverter.class)
     private LocalDate birthDay;
-    @ExcelColumn(headerName = "性别 0男 1女", orderNum = 3, columnWidth = 1300, beforeConvert = {"0", "1"}, afterConvert = {"男", "女"})
+    @ExcelColumn(headerName = "性别", orderNum = 3, columnWidth = 2000, beforeConvert = {"0", "1"}, afterConvert = {"男", "女"})
     private Integer gender;
-    @ExcelColumn(headerName = "头像", orderNum = 4, columnWidth = 3800, isPicture = true)
+    @ExcelColumn(headerName = "头像", orderNum = 4, columnWidth = 4500, isPicture = true)
     private String headPicture;
 
 }
@@ -59,4 +59,22 @@ List<YourDataBean> dataList = ExcelImportSimple.readList(file, YourDataBean.clas
 2. 安全读取模式，中途所有错误和异常将被封装为SafetyResult记录并返回，包括整体汇总和每条的信息，会读取完全部数据后才停止：
 ```
 SafetyResult<List<SafetyResult<YourDataBean>>> readResult = ExcelImportSimple.readListSafety(file, YourDataBean.class);
+```
+
+> 导入模式1.0.2新功能，支持以lambda表达式的方式传入InputStream流，并且由工具内部消化可能抛出的异常进行统一处理：
+1. 正常读取模式，中途出错以异常形式抛出（主要为导入数据类型不对或校验不通过异常），并且出错后自定停止后续导入读取：
+```
+List<YourDataBean> dataList = ExcelImportSimple.readList(FileInputStream::new, file, YourDataBean.class);
+```
+2. 安全读取模式，中途所有错误和异常将被封装为SafetyResult记录并返回，包括整体汇总和每条的信息，会读取完全部数据后才停止：
+```
+SafetyResult<List<SafetyResult<YourDataBean>>> readResult = ExcelImportSimple.readListSafety(FileInputStream::new, file, YourDataBean.class);
+```
+3. 你也可以在表单上传文件时直接这样使用：
+```
+List<YourDataBean> dataList = ExcelImportSimple
+        .readList(MultipartFile::getInputStream, multipartFile, YourDataBean.class);
+//or
+SafetyResult<List<SafetyResult<YourDataBean>>> readResult = ExcelImportSimple
+        .readListSafety(MultipartFile::getInputStream, multipartFile, YourDataBean.class);
 ```

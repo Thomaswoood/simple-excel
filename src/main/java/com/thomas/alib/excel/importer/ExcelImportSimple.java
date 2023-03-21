@@ -1,5 +1,6 @@
 package com.thomas.alib.excel.importer;
 
+import com.thomas.alib.excel.interfaces.EFunction;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
@@ -18,7 +19,25 @@ public class ExcelImportSimple {
     /**
      * 读取excel文件总行数
      *
-     * @param inputStream 上传的excel的文件流
+     * @param inputStreamGetFunc 获取excel文件流的方法
+     * @param inputStreamSource  获取excel文件流的源对象
+     * @param <S>                获取excel文件流的源对象的泛型
+     * @return 总行数
+     */
+    public static <S> long getTotalLineCount(EFunction<S, InputStream> inputStreamGetFunc, S inputStreamSource) {
+        Workbook wb;
+        try {
+            wb = WorkbookFactory.create(inputStreamGetFunc.apply(inputStreamSource));
+        } catch (Exception e) {
+            throw new RuntimeException("文件读取失败", e);
+        }
+        return getTotalLineCount(wb);
+    }
+
+    /**
+     * 读取excel文件总行数
+     *
+     * @param inputStream excel的文件流
      * @return 总行数
      */
     public static long getTotalLineCount(InputStream inputStream) {
@@ -70,7 +89,27 @@ public class ExcelImportSimple {
     /**
      * 读取excel文件为指定类型的数据列表
      *
-     * @param inputStream 上传的excel的文件流
+     * @param inputStreamGetFunc 获取excel文件流的方法
+     * @param inputStreamSource  获取excel文件流的源对象
+     * @param clazz              指定类型
+     * @param <S>                获取excel文件流的源对象的泛型
+     * @param <E>                指定类型泛型
+     * @return 数据列表
+     */
+    public static <S, E> List<E> readList(EFunction<S, InputStream> inputStreamGetFunc, S inputStreamSource, Class<E> clazz) {
+        Workbook wb;
+        try {
+            wb = WorkbookFactory.create(inputStreamGetFunc.apply(inputStreamSource));
+        } catch (Exception e) {
+            throw new RuntimeException("文件读取失败", e);
+        }
+        return readList(wb, clazz);
+    }
+
+    /**
+     * 读取excel文件为指定类型的数据列表
+     *
+     * @param inputStream excel的文件流
      * @param clazz       指定类型
      * @param <E>         指定类型泛型
      * @return 数据列表
@@ -127,7 +166,21 @@ public class ExcelImportSimple {
     /**
      * 读取excel文件为指定类型的数据列表，安全模式，会把整个文件读完，并把错误信息返回而不是抛出异常
      *
-     * @param inputStream 上传的excel的文件流
+     * @param inputStreamGetFunc 获取excel文件流的方法
+     * @param inputStreamSource  获取excel文件流的源对象
+     * @param clazz              指定类型
+     * @param <S>                获取excel文件流的源对象的泛型
+     * @param <E>                指定类型泛型
+     * @return 数据列表
+     */
+    public static <S, E> SafetyResult<List<SafetyResult<E>>> readListSafety(EFunction<S, InputStream> inputStreamGetFunc, S inputStreamSource, Class<E> clazz) {
+        return readListSafety(inputStreamGetFunc, inputStreamSource, clazz, null);
+    }
+
+    /**
+     * 读取excel文件为指定类型的数据列表，安全模式，会把整个文件读完，并把错误信息返回而不是抛出异常
+     *
+     * @param inputStream excel的文件流
      * @param clazz       指定类型
      * @param <E>         指定类型泛型
      * @return 数据列表
@@ -151,7 +204,32 @@ public class ExcelImportSimple {
     /**
      * 读取excel文件为指定类型的数据列表，安全模式，会把整个文件读完，并把错误信息返回而不是抛出异常
      *
-     * @param inputStream 上传的excel的文件流
+     * @param inputStreamGetFunc 获取excel文件流的方法
+     * @param inputStreamSource  获取excel文件流的源对象
+     * @param clazz              指定类型
+     * @param consumer           读取到每一行数据事件的消费者
+     * @param <S>                获取excel文件流的源对象的泛型
+     * @param <E>                指定类型泛型
+     * @return 数据列表
+     */
+    public static <S, E> SafetyResult<List<SafetyResult<E>>> readListSafety(EFunction<S, InputStream> inputStreamGetFunc, S inputStreamSource, Class<E> clazz, BiConsumer<Long, SafetyResult<E>> consumer) {
+        SafetyResult<List<SafetyResult<E>>> result = new SafetyResult<>();
+        result.setData(new ArrayList<>());
+        Workbook wb;
+        try {
+            wb = WorkbookFactory.create(inputStreamGetFunc.apply(inputStreamSource));
+        } catch (Exception e) {
+            result.appendMsg("文件读取失败;" + e.getLocalizedMessage());
+            result.setReadSuccess(false);
+            return result;
+        }
+        return readListSafety(wb, clazz, consumer, result);
+    }
+
+    /**
+     * 读取excel文件为指定类型的数据列表，安全模式，会把整个文件读完，并把错误信息返回而不是抛出异常
+     *
+     * @param inputStream excel的文件流
      * @param clazz       指定类型
      * @param consumer    读取到每一行数据事件的消费者
      * @param <E>         指定类型泛型
