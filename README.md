@@ -14,9 +14,9 @@
 
 > 类注解示例
 ```
-@ExcelSheet(sheetName = "YourDataBean示例", showIndex = false)
-@ExcelExportHeadStyle(fontName = "宋体", textSize = 12, isBold = true, horAlignment = HorAlignment.CENTER, verAlignment = VerAlignment.CENTER, isWrapText = true, fourSideBorder = BorderType.THIN)
-@ExcelExportDataStyle(fontName = "宋体", textSize = 10, horAlignment = HorAlignment.CENTER, verAlignment = VerAlignment.CENTER, isWrapText = true, fourSideBorder = BorderType.THIN)
+@ExcelSheet(sheetName = "YourDataBean示例", showIndex = false, dataRowHeight = 3000)
+@ExcelExportHeadStyle(fontName = "宋体", textSize = 12, isBold = true, horAlignment = HorAlignment.CENTER, verAlignment = VerAlignment.CENTER, isWrapText = true, fourSideBorder = BorderType.THIN, bgColor = "#E3E3E3")
+@ExcelExportDataStyle(fontName = "宋体", textSize = 10, horAlignment = HorAlignment.CENTER, verAlignment = VerAlignment.CENTER, isWrapText = true, fourSideBorder = BorderType.THIN, textColor = "#8F8F8F")
 public class YourDataBean {
 
     @ExcelColumn(headerName = "姓名", orderNum = 1)

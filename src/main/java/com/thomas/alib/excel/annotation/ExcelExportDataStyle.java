@@ -42,9 +42,14 @@ public @interface ExcelExportDataStyle {
     boolean isStrikeout() default false;
 
     /**
-     * 文字颜色，默认-1不设置
+     * 文字颜色，默认为空不设置，设置时使用#000000格式
      */
-    short textColor() default -1;
+    String textColor() default "";
+
+    /**
+     * 背景颜色，默认为空不设置，设置时使用#000000格式
+     */
+    String bgColor() default "";
 
     /**
      * 水平对齐方式，默认自动对齐

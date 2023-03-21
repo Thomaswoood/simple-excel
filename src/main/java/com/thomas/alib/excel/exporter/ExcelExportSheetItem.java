@@ -7,7 +7,6 @@ import com.thomas.alib.excel.utils.ReflectUtil;
 import com.thomas.alib.excel.utils.StringUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFClientAnchor;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -23,7 +22,7 @@ class ExcelExportSheetItem<T> {
     /**
      * excel导出构建对象
      */
-    private Workbook workbook;
+    private SXSSFWorkbook sxssfWorkbook;
     /**
      * 数据源列表
      */
@@ -66,14 +65,14 @@ class ExcelExportSheetItem<T> {
     /**
      * 构造方法
      *
-     * @param workbook         excel导出构建对象
+     * @param sxssfWorkbook    excel导出构建对象
      * @param source_list      数据源列表
      * @param sheet_data_clazz 数据源泛型class
      * @param show_index       是否显示序号
      * @param sheet_name       外部设置的sheet名称，如果有值，则此值优先级比注解内的高
      */
-    ExcelExportSheetItem(Workbook workbook, List<T> source_list, Class<T> sheet_data_clazz, Boolean show_index, String sheet_name) {
-        this.workbook = workbook;
+    ExcelExportSheetItem(SXSSFWorkbook sxssfWorkbook, List<T> source_list, Class<T> sheet_data_clazz, Boolean show_index, String sheet_name) {
+        this.sxssfWorkbook = sxssfWorkbook;
         this.sourceList = source_list;
         //获取数据类型
         this.sheetDataClazz = sheet_data_clazz;
@@ -110,9 +109,9 @@ class ExcelExportSheetItem<T> {
             dataRowHeight = excel_sheet.dataRowHeight();//数据行高度
         }
         //表头样式处理
-        headStyleProcessor = ExcelExportStyleProcessor.withHead(workbook, sheetDataClazz);
+        headStyleProcessor = ExcelExportStyleProcessor.withHead(sxssfWorkbook, sheetDataClazz);
         //数据样式处理
-        dataStyleProcessor = ExcelExportStyleProcessor.withData(workbook, sheetDataClazz);
+        dataStyleProcessor = ExcelExportStyleProcessor.withData(sxssfWorkbook, sheetDataClazz);
     }
 
     /**
@@ -135,7 +134,7 @@ class ExcelExportSheetItem<T> {
                 Collections.sort(excel_column_list);//给列排序
         }
         //根据解析信息创建excel数据
-        Sheet sheet = workbook.createSheet(sheetName());//创建sheet对象
+        Sheet sheet = sxssfWorkbook.createSheet(sheetName());//创建sheet对象
         //创建并填充表头信息
         Row headRow = sheet.createRow(0);//创建表头
         //设置表头行高
@@ -178,9 +177,9 @@ class ExcelExportSheetItem<T> {
                                 cell.setCellValue("图片： " + column.getColumnValueFromSource(item_source) + "  加载失败");
                             } else {
                                 Drawing drawing = sheet.getDrawingPatriarch();
-                                if (drawing == null)  drawing = sheet.createDrawingPatriarch();
+                                if (drawing == null) drawing = sheet.createDrawingPatriarch();
                                 ClientAnchor clientAnchor = drawing.createAnchor(0, 0, 0, 0, r_i, i + 1, r_i + 1, i + 2);
-                                int addPicture = workbook.addPicture(pictureBytes, SXSSFWorkbook.PICTURE_TYPE_JPEG);
+                                int addPicture = sxssfWorkbook.addPicture(pictureBytes, SXSSFWorkbook.PICTURE_TYPE_JPEG);
                                 Picture picture = drawing.createPicture(clientAnchor, addPicture);
                                 picture.getPictureData();
                             }

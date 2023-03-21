@@ -7,6 +7,13 @@ import com.thomas.alib.excel.enums.HorAlignment;
 import com.thomas.alib.excel.enums.VerAlignment;
 import com.thomas.alib.excel.utils.StringUtils;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.DefaultIndexedColorMap;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFColor;
+import org.apache.poi.xssf.usermodel.XSSFFont;
+
+import java.awt.Color;
 
 /**
  * Excel导出时表格样式处理者
@@ -39,9 +46,14 @@ class ExcelExportStyleProcessor {
     private boolean isStrikeout;
 
     /**
-     * 文字颜色，默认-1不设置
+     * 文字颜色，默认为空不设置
      */
-    private short textColor;
+    private XSSFColor textColor;
+
+    /**
+     * 背景颜色，默认为空不设置
+     */
+    private XSSFColor bgColor;
 
     /**
      * 水平对齐方式，默认自动对齐
@@ -65,33 +77,34 @@ class ExcelExportStyleProcessor {
     /**
      * 根据配置数据创建出的复用样式
      */
-    private CellStyle baseStyle;
+    private XSSFCellStyle baseStyle;
 
     /**
      * 默认构造方法，设置默认值
      */
     ExcelExportStyleProcessor() {
         //设置默认值
-        fontName = null;//表头行字体名称，默认为空不设置
-        textSize = 0;//表头行文字大小，默认0不设置
-        isBold = false;//表头行文字是否加粗，默认不加粗
-        isItalic = false;//表头行文字是否斜体，默认不斜体
-        isStrikeout = false;//表头行文字是否划线，默认不划线
-        textColor = -1;//表头行文字颜色，默认-1不设置
-        horAlignment = HorAlignment.GENERAL;//表头行水平对齐方式，默认自动对齐
-        verAlignment = VerAlignment.CENTER;//表头行垂直对齐方式，默认垂直居中
-        isWrapText = false;//表头行文字是否自动换行，默认否
-        fourSideBorder = BorderType.NONE;//表头行4边边框样式（仅支持基础样式），默认0无边框
+        fontName = null;//字体名称，默认为空不设置
+        textSize = 0;//文字大小，默认0不设置
+        isBold = false;//文字是否加粗，默认不加粗
+        isItalic = false;//文字是否斜体，默认不斜体
+        isStrikeout = false;//文字是否划线，默认不划线
+        textColor = null;//文字颜色，默认为空不设置
+        bgColor = null;//背景颜色，默认为空不设置
+        horAlignment = HorAlignment.GENERAL;//水平对齐方式，默认自动对齐
+        verAlignment = VerAlignment.CENTER;//垂直对齐方式，默认垂直居中
+        isWrapText = false;//文字是否自动换行，默认否
+        fourSideBorder = BorderType.NONE;//4边边框样式（仅支持基础样式），默认0无边框
     }
 
     /**
      * 根据workbook初始化样式
      *
-     * @param workbook excel导出构建对象
+     * @param sxssfWorkbook excel导出构建对象
      */
-    void initWith(Workbook workbook) {
+    void initWith(SXSSFWorkbook sxssfWorkbook) {
         //根据配置数据初始化样式
-        baseStyle = workbook.createCellStyle();
+        baseStyle = (XSSFCellStyle) sxssfWorkbook.createCellStyle();
         //设置水平对齐方式
         switch (horAlignment) {
             case GENERAL://自动对齐
@@ -176,7 +189,7 @@ class ExcelExportStyleProcessor {
             }
         }
         //设置字体样式
-        Font font = workbook.createFont();
+        XSSFFont font = (XSSFFont) sxssfWorkbook.createFont();
         //设置字体名称
         if (StringUtils.isNotBlank(fontName)) {
             font.setFontName(fontName);
@@ -192,19 +205,26 @@ class ExcelExportStyleProcessor {
         //设置是否划线
         font.setStrikeout(isStrikeout);
         //设置文字颜色
-        if (textColor >= 0) {
+        if (textColor != null) {
             font.setColor(textColor);
         }
         //将字体设置进样式对象
         baseStyle.setFont(font);
+        //设置背景色
+        if (bgColor != null) {
+//            baseStyle.setFillBackgroundColor(bgColor);
+            baseStyle.setFillForegroundColor(bgColor);
+            baseStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        }
     }
 
     /**
      * 读取表头样式注解信息
      *
+     * @param sxssfWorkbook    excel导出构建对象
      * @param sheet_data_clazz 数据源泛型class
      */
-    static ExcelExportStyleProcessor withHead(Workbook workbook, Class<?> sheet_data_clazz) {
+    static ExcelExportStyleProcessor withHead(SXSSFWorkbook sxssfWorkbook, Class<?> sheet_data_clazz) {
         //处理样式类返回对象
         ExcelExportStyleProcessor processor = new ExcelExportStyleProcessor();
         //取得表格sheet相关注解
@@ -216,22 +236,34 @@ class ExcelExportStyleProcessor {
             processor.isBold = style.isBold();//表头行文字是否加粗
             processor.isItalic = style.isItalic();//表头行文字是否斜体
             processor.isStrikeout = style.isStrikeout();//表头行文字是否划线
-            processor.textColor = style.textColor();//表头行文字颜色
+            //表头行文字颜色
+            try {
+                processor.textColor = new XSSFColor(Color.decode(style.textColor()), new DefaultIndexedColorMap());
+            } catch (Throwable e) {
+                processor.textColor = null;
+            }
+            //表头行背景颜色
+            try {
+                processor.bgColor = new XSSFColor(Color.decode(style.bgColor()), new DefaultIndexedColorMap());
+            } catch (Throwable e) {
+                processor.bgColor = null;
+            }
             processor.horAlignment = style.horAlignment();//表头行水平对齐方式
             processor.verAlignment = style.verAlignment();//表头行垂直对齐方式
             processor.isWrapText = style.isWrapText();//表头行文字是否自动换行
             processor.fourSideBorder = style.fourSideBorder();//表头行4边边框样式
         }
-        processor.initWith(workbook);
+        processor.initWith(sxssfWorkbook);
         return processor;
     }
 
     /**
      * 读取表头样式注解信息
      *
+     * @param sxssfWorkbook    excel导出构建对象
      * @param sheet_data_clazz 数据源泛型class
      */
-    static ExcelExportStyleProcessor withData(Workbook workbook, Class<?> sheet_data_clazz) {
+    static ExcelExportStyleProcessor withData(SXSSFWorkbook sxssfWorkbook, Class<?> sheet_data_clazz) {
         //处理样式类返回对象
         ExcelExportStyleProcessor processor = new ExcelExportStyleProcessor();
         //取得表格sheet相关注解
@@ -243,13 +275,24 @@ class ExcelExportStyleProcessor {
             processor.isBold = style.isBold();//数据行文字是否加粗
             processor.isItalic = style.isItalic();//数据行文字是否斜体
             processor.isStrikeout = style.isStrikeout();//数据行文字是否划线
-            processor.textColor = style.textColor();//数据行文字颜色
+            //数据行文字颜色
+            try {
+                processor.textColor = new XSSFColor(Color.decode(style.textColor()), new DefaultIndexedColorMap());
+            } catch (Throwable e) {
+                processor.textColor = null;
+            }
+            //数据行背景颜色
+            try {
+                processor.bgColor = new XSSFColor(Color.decode(style.bgColor()), new DefaultIndexedColorMap());
+            } catch (Throwable e) {
+                processor.bgColor = null;
+            }
             processor.horAlignment = style.horAlignment();//数据行水平对齐方式
             processor.verAlignment = style.verAlignment();//数据行垂直对齐方式
             processor.isWrapText = style.isWrapText();//数据行文字是否自动换行
             processor.fourSideBorder = style.fourSideBorder();//数据行4边边框样式
         }
-        processor.initWith(workbook);
+        processor.initWith(sxssfWorkbook);
         return processor;
     }
 
