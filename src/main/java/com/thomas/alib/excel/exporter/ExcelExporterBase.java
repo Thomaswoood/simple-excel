@@ -163,7 +163,7 @@ public abstract class ExcelExporterBase<C extends ExcelExporterBase<C>> {
         OutputStream os = null;
         try {
             os = getOutputStream();
-            sxssfWorkbook.write(getOutputStream());
+            sxssfWorkbook.write(os);
         } catch (Exception e) {
             throw new RuntimeException("导出失败", e);
         } finally {
