@@ -7,6 +7,7 @@ import com.thomas.alib.excel.utils.ReflectUtil;
 import com.thomas.alib.excel.utils.StringUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -54,31 +55,40 @@ class ExcelExportSheetItem<T> {
      */
     private short dataRowHeight;
     /**
-     * 表头行样式处理者
+     * 表头行样式
      */
-    private ExcelExportStyleProcessor headStyleProcessor;
+    private XSSFCellStyle headStyle;
     /**
-     * 数据行样式处理者
+     * 数据行样式
      */
-    private ExcelExportStyleProcessor dataStyleProcessor;
+    private XSSFCellStyle dataStyle;
+    /**
+     * 全部的成员列表
+     */
+    private List<Field> totalFieldList;
+    /**
+     * 全部的成员对应的excel列信息列表
+     */
+    private List<ExcelExportColumnItem> excelColumnList;
 
     /**
      * 构造方法
      *
-     * @param sxssfWorkbook    excel导出构建对象
+     * @param sxssf_workbook   excel导出构建对象
      * @param source_list      数据源列表
      * @param sheet_data_clazz 数据源泛型class
      * @param show_index       是否显示序号
      * @param sheet_name       外部设置的sheet名称，如果有值，则此值优先级比注解内的高
      */
-    ExcelExportSheetItem(SXSSFWorkbook sxssfWorkbook, List<T> source_list, Class<T> sheet_data_clazz, Boolean show_index, String sheet_name) {
-        this.sxssfWorkbook = sxssfWorkbook;
+    ExcelExportSheetItem(SXSSFWorkbook sxssf_workbook, List<T> source_list, Class<T> sheet_data_clazz, Boolean show_index, String sheet_name) {
+        this.sxssfWorkbook = sxssf_workbook;
         this.sourceList = source_list;
         //获取数据类型
         this.sheetDataClazz = sheet_data_clazz;
         if (sheetDataClazz == null) throw new RuntimeException("获取导出数据类型失败");
         //取得表格sheet相关注解
         ExcelSheet excel_sheet = sheetDataClazz.getAnnotation(ExcelSheet.class);
+        //判断是否传入了sheet_name，传入的参数值优先级更高，单独判断处理
         if (StringUtils.isEmpty(sheet_name)) {
             if (excel_sheet == null) {//未设置，设置默认值
                 sheetName = sheetDataClazz.getSimpleName();
@@ -88,6 +98,7 @@ class ExcelExportSheetItem<T> {
         } else {
             sheetName = sheet_name;
         }
+        //判断是否传入了show_index，传入的参数值优先级更高，单独判断处理
         if (show_index == null) {//如果需要显示序号，则添加序号
             if (excel_sheet == null) {//未设置，设置默认值
                 showIndex = true;
@@ -97,42 +108,53 @@ class ExcelExportSheetItem<T> {
         } else {
             showIndex = show_index;
         }
+        //表头样式处理
+        ExcelExportStyleProcessor head_style_processor;
+
+        //数据样式处理
+        ExcelExportStyleProcessor data_style_processor;
+        //表格sheet注解判空区分处理
         if (excel_sheet == null) {
             //未设置sheet注解，设置默认值
             columnSortType = SortType.S2B;//列排序方式，默认由小到大排序
             headRowHeight = -1;//表头行高度，默认-1不设置
             dataRowHeight = -1;//数据行高度，默认-1不设置
+            head_style_processor = null;
+            data_style_processor = null;
         } else {
             //已设置sheet注解，取出设置的值
             columnSortType = excel_sheet.columnSortType();//列排序方式
             headRowHeight = excel_sheet.headRowHeight();//表头行高度
             dataRowHeight = excel_sheet.dataRowHeight();//数据行高度
+            //读取表头行样式
+            head_style_processor = ExcelExportStyleProcessor.read(excel_sheet.baseStyle()).coverBySourceExceptNotSet(excel_sheet.headStyle());
+            headStyle = head_style_processor.getXSSFCellStyle(sxssfWorkbook);
+            //读取数据行样式
+            data_style_processor = ExcelExportStyleProcessor.read(excel_sheet.baseStyle()).coverBySourceExceptNotSet(excel_sheet.dataStyle());
+            dataStyle = data_style_processor.getXSSFCellStyle(sxssfWorkbook);
         }
-        //表头样式处理
-        headStyleProcessor = ExcelExportStyleProcessor.withHead(sxssfWorkbook, sheetDataClazz);
-        //数据样式处理
-        dataStyleProcessor = ExcelExportStyleProcessor.withData(sxssfWorkbook, sheetDataClazz);
+        //解析全部成员属性
+        totalFieldList = ReflectUtil.getAccessibleFieldIncludeSuper(sheetDataClazz);//全部的成员列表
+        excelColumnList = new ArrayList<>();//解析成员为excel列信息列表
+        for (Field item_field : totalFieldList) {//遍历寻找所有有效column成员
+            ExcelExportColumnItem item_column_field = new ExcelExportColumnItem(item_field, sxssfWorkbook, head_style_processor, data_style_processor);
+            if (item_column_field.isValid()) //有效
+                excelColumnList.add(item_column_field);
+        }
+        //给列排序
+        switch (columnSortType) {
+            case B2S:
+                Collections.reverse(excelColumnList);
+            case S2B:
+            default:
+                Collections.sort(excelColumnList);
+        }
     }
 
     /**
      * 初始化sheet并设置数据到sheet中
      */
     void writeData() {
-        //解析全部成员属性
-        List<Field> total_field_list = ReflectUtil.getAccessibleFieldIncludeSuper(sheetDataClazz);//全部的成员列表
-        List<ExcelExportColumnItem> excel_column_list = new ArrayList<>();//解析成员为excel列信息列表
-        for (Field item_field : total_field_list) {//遍历寻找所有有效column成员
-            ExcelExportColumnItem item_column_field = new ExcelExportColumnItem(item_field);
-            if (item_column_field.isValid()) //有效
-                excel_column_list.add(item_column_field);
-        }
-        switch (columnSortType) {
-            case B2S:
-                Collections.reverse(excel_column_list);//给列排序
-            case S2B:
-            default:
-                Collections.sort(excel_column_list);//给列排序
-        }
         //根据解析信息创建excel数据
         Sheet sheet = sxssfWorkbook.createSheet(sheetName());//创建sheet对象
         //创建并填充表头信息
@@ -143,14 +165,18 @@ class ExcelExportSheetItem<T> {
         if (showIndex) {//如果需要默认显示序号
             Cell cell = headRow.createCell(r_i);
             cell.setCellValue("序号");
-            headStyleProcessor.setStyle(cell);
+            if (headStyle != null) cell.setCellStyle(headStyle);
             sheet.setColumnWidth(r_i, 3000);
             r_i++;
         }
-        for (ExcelExportColumnItem column : excel_column_list) {
+        for (ExcelExportColumnItem column : excelColumnList) {
             Cell cell = headRow.createCell(r_i);
             cell.setCellValue(column.getHeadName());
-            headStyleProcessor.setStyle(cell);
+            if (column.getHeadStyle() != null) {
+                cell.setCellStyle(column.getHeadStyle());
+            } else if (headStyle != null) {
+                cell.setCellStyle(headStyle);
+            }
             sheet.setColumnWidth(r_i, column.getColumnWidth());
             r_i++;
         }
@@ -165,10 +191,10 @@ class ExcelExportSheetItem<T> {
                 if (showIndex) {//如果需要默认显示序号
                     Cell cell = dataRow.createCell(r_i);
                     cell.setCellValue(i + 1);
-                    dataStyleProcessor.setStyle(cell);
+                    if (dataStyle != null) cell.setCellStyle(dataStyle);
                     r_i++;
                 }
-                for (ExcelExportColumnItem column : excel_column_list) {
+                for (ExcelExportColumnItem column : excelColumnList) {
                     Cell cell = dataRow.createCell(r_i);
                     if (column.isPicture()) {
                         try {
@@ -189,7 +215,11 @@ class ExcelExportSheetItem<T> {
                     } else {
                         cell.setCellValue(column.getColumnValueFromSource(item_source));
                     }
-                    dataStyleProcessor.setStyle(cell);
+                    if (column.getDataStyle() != null) {
+                        cell.setCellStyle(column.getDataStyle());
+                    } else if (dataStyle != null) {
+                        cell.setCellStyle(dataStyle);
+                    }
                     r_i++;
                 }
             }

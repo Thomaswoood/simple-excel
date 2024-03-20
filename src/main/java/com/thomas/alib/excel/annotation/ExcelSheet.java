@@ -38,4 +38,19 @@ public @interface ExcelSheet {
      * 数据行高度，默认-1不设置
      */
     short dataRowHeight() default -1;
+
+    /**
+     * 全局通用基础样式，使用优先级最低，仅导出时有作用
+     */
+    ExcelStyle baseStyle() default @ExcelStyle;
+
+    /**
+     * 表头样式，在{@link #baseStyle}基础之上设置，当与其定义了相同的样式属性时，以本注解中的为主，仅导出时有作用
+     */
+    ExcelStyle headStyle() default @ExcelStyle;
+
+    /**
+     * 数据样式，在{@link #baseStyle}基础之上设置，当与其定义了相同的样式属性时，以本注解中的为主，仅导出时有作用
+     */
+    ExcelStyle dataStyle() default @ExcelStyle;
 }

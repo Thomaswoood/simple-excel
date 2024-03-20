@@ -2,8 +2,6 @@ package com.thomas.alib.excel.base;
 
 import com.thomas.alib.excel.annotation.ExcelColumn;
 import com.thomas.alib.excel.converter.*;
-import com.thomas.alib.excel.loader.PictureLoader;
-import com.thomas.alib.excel.loader.PictureLoaderDefault;
 import com.thomas.alib.excel.utils.StringUtils;
 
 import java.lang.reflect.Field;
@@ -20,6 +18,10 @@ public class ExcelColumnRender {
      * 列属性类型
      */
     protected Class<?> columnClass;
+    /**
+     * 列属性表格注解对象
+     */
+    protected ExcelColumn excelColumn;
     /**
      * 是否有效
      */
@@ -53,10 +55,6 @@ public class ExcelColumnRender {
      */
     protected boolean isPicture;
     /**
-     * 图片加载器
-     */
-    protected PictureLoader<?> pictureLoader;
-    /**
      * 列的index
      */
     private int columnIndex;
@@ -69,62 +67,45 @@ public class ExcelColumnRender {
     protected void init() {
         columnField.setAccessible(true);// 抑制Java的访问控制检查
         columnClass = columnField.getType();
-        ExcelColumn excel_column = columnField.getAnnotation(ExcelColumn.class);
-        if (excel_column != null) {//包含column注解
+        excelColumn = columnField.getAnnotation(ExcelColumn.class);
+        if (excelColumn != null) {//包含column注解
             isValid = true;
-            String item_header_name = excel_column.headerName();//列表头名
+            String item_header_name = excelColumn.headerName();//列表头名
             if (StringUtils.isEmpty(item_header_name))//为空默认置为字段名
                 headName = columnField.getName();
             else//否则显示设置的表头名
                 headName = item_header_name;
-            orderNum = excel_column.orderNum();//列排序字段
-            columnIndex = excel_column.orderNum();//列在excel中实际顺序字段(仅在import模式中使用，默认取用注解设置的，在读取表头时也会再根据表格实际情况再设置一次)
-            columnWidth = excel_column.columnWidth();//列宽度
-            prefix = excel_column.prefix();//默认前缀
-            suffix = excel_column.suffix();//默认后缀
-            if (excel_column.converter() == DefaultConverter.class) {//没有配置转换器，根据类型或者beforeConverter判断自动处理生成一个
+            orderNum = excelColumn.orderNum();//列排序字段
+            columnIndex = excelColumn.orderNum();//列在excel中实际顺序字段(仅在import模式中使用，默认取用注解设置的，在读取表头时也会再根据表格实际情况再设置一次)
+            columnWidth = excelColumn.columnWidth();//列宽度
+            prefix = excelColumn.prefix();//默认前缀
+            suffix = excelColumn.suffix();//默认后缀
+            if (excelColumn.converter() == DefaultConverter.class) {//没有配置转换器，根据类型或者beforeConverter判断自动处理生成一个
                 if (columnClass == LocalDateTime.class) {
                     converter = new LocalDateTimeConverter();
                 } else if (columnClass == LocalDate.class) {
                     converter = new LocalDateConverter();
                 } else if (columnClass == Date.class) {
                     converter = new DateConverter();
-                } else if (excel_column.beforeConvert().length > 0//如果设置了before和after则自动使用SimpleConvert
-                        && excel_column.afterConvert().length > 0
-                        && excel_column.beforeConvert().length == excel_column.afterConvert().length) {
-                    converter = new SimpleConvert(excel_column.beforeConvert(), excel_column.afterConvert());
+                } else if (excelColumn.beforeConvert().length > 0//如果设置了before和after则自动使用SimpleConvert
+                        && excelColumn.afterConvert().length > 0
+                        && excelColumn.beforeConvert().length == excelColumn.afterConvert().length) {
+                    converter = new SimpleConvert(excelColumn.beforeConvert(), excelColumn.afterConvert());
                 } else {
                     converter = new DefaultConverter();
                 }
             } else {
                 try {
-                    if (excel_column.converter().isEnum()) {//枚举类型不可创建，需要取出一个
-                        converter = excel_column.converter().getEnumConstants()[0];
+                    if (excelColumn.converter().isEnum()) {//枚举类型不可创建，需要取出一个
+                        converter = excelColumn.converter().getEnumConstants()[0];
                     } else {//其他类型则自动创建一个
-                        converter = excel_column.converter().newInstance();
+                        converter = excelColumn.converter().newInstance();
                     }
                 } catch (Throwable e) {//发生未知错误，使用默认转化器
                     converter = new DefaultConverter();
                 }
             }
-            isPicture = excel_column.isPicture();//是否按图片处理
-            if (isPicture) {
-                if (excel_column.pictureLoader() == PictureLoaderDefault.class) {
-                    //使用默认图片加载器
-                    pictureLoader = new PictureLoaderDefault();
-                } else {
-                    //使用自定义图片加载器
-                    try {
-                        if (excel_column.pictureLoader().isEnum()) {//枚举类型不可创建，需要取出一个
-                            pictureLoader = excel_column.pictureLoader().getEnumConstants()[0];
-                        } else {//其他类型则自动创建一个
-                            pictureLoader = excel_column.pictureLoader().newInstance();
-                        }
-                    } catch (Throwable e) {//发生未知错误，使用默认转化器
-                        pictureLoader = new PictureLoaderDefault();
-                    }
-                }
-            }
+            isPicture = excelColumn.isPicture();//是否按图片处理
         } else isValid = false;
     }
 
@@ -154,15 +135,6 @@ public class ExcelColumnRender {
      */
     public boolean isPicture() {
         return isPicture;
-    }
-
-    /**
-     * 获取图片加载器
-     *
-     * @return 图片加载器
-     */
-    public PictureLoader<?> getPictureLoader() {
-        return pictureLoader;
     }
 
     /**

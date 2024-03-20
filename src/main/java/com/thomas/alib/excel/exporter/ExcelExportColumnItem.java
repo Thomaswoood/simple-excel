@@ -2,6 +2,10 @@ package com.thomas.alib.excel.exporter;
 
 import com.thomas.alib.excel.base.ExcelColumnRender;
 import com.thomas.alib.excel.converter.DefaultConverter;
+import com.thomas.alib.excel.loader.PictureLoader;
+import com.thomas.alib.excel.loader.PictureLoaderDefault;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 
 import java.lang.reflect.Field;
 
@@ -9,9 +13,50 @@ import java.lang.reflect.Field;
  * Excel导出对应每个列(Column)的解析工具
  */
 class ExcelExportColumnItem extends ExcelColumnRender implements Comparable<ExcelExportColumnItem> {
+    /**
+     * 图片加载器
+     */
+    protected PictureLoader<?> pictureLoader;
+    /**
+     * 表头行样式
+     */
+    private XSSFCellStyle headStyle;
+    /**
+     * 数据行样式
+     */
+    private XSSFCellStyle dataStyle;
 
-    ExcelExportColumnItem(Field field) {
+    ExcelExportColumnItem(Field field, SXSSFWorkbook sxssf_workbook, ExcelExportStyleProcessor head_style_processor, ExcelExportStyleProcessor data_style_processor) {
         super(field);
+        if (isValid) {
+            if (ExcelExportStyleProcessor.hadSet(excelColumn.columnStyle())) {
+                //数据样式处理
+                dataStyle = data_style_processor.coverBySourceExceptNotSetInNew(excelColumn.columnStyle()).getXSSFCellStyle(sxssf_workbook);
+                //判断列样式是否影响表头
+                if (excelColumn.columnStyleInHead()) {
+                    //表头样式处理
+                    headStyle = head_style_processor.coverBySourceExceptNotSetInNew(excelColumn.columnStyle()).getXSSFCellStyle(sxssf_workbook);
+                }
+            }
+            //判断是否按图片处理，按图片处理导出时，需要初始化图片加载器
+            if (isPicture) {
+                if (excelColumn.pictureLoader() == PictureLoaderDefault.class) {
+                    //使用默认图片加载器
+                    pictureLoader = new PictureLoaderDefault();
+                } else {
+                    //使用自定义图片加载器
+                    try {
+                        if (excelColumn.pictureLoader().isEnum()) {//枚举类型不可创建，需要取出一个
+                            pictureLoader = excelColumn.pictureLoader().getEnumConstants()[0];
+                        } else {//其他类型则自动创建一个
+                            pictureLoader = excelColumn.pictureLoader().newInstance();
+                        }
+                    } catch (Throwable e) {//发生未知错误，使用默认转化器
+                        pictureLoader = new PictureLoaderDefault();
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -49,6 +94,14 @@ class ExcelExportColumnItem extends ExcelColumnRender implements Comparable<Exce
             //成员值无效
             return "读取失败";
         }
+    }
+
+    public XSSFCellStyle getHeadStyle() {
+        return headStyle;
+    }
+
+    public XSSFCellStyle getDataStyle() {
+        return dataStyle;
     }
 
     /**

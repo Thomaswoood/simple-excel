@@ -74,7 +74,17 @@ public @interface ExcelColumn {
     boolean isPicture() default false;
 
     /**
-     * 图片加载器，默认认为图片数据源是网络上完整的url来加载
+     * 图片加载器，默认认为图片数据源是网络上完整的url来加载，仅导出时有作用
      */
     Class<? extends PictureLoader<?>> pictureLoader() default PictureLoaderDefault.class;
+
+    /**
+     * 单独设置列的样式，在{@link ExcelSheet#dataStyle()}基础之上设置，当与其定义了相同的样式属性时，以本注解中的为主，仅导出时有作用
+     */
+    ExcelStyle columnStyle() default @ExcelStyle;
+
+    /**
+     * 单独设置列的样式是否在表头行起作用，当定义了相同的样式属性时，以{@link #columnStyle}为主，仅导出时有作用
+     */
+    boolean columnStyleInHead() default false;
 }

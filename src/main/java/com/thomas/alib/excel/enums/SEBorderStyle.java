@@ -3,7 +3,8 @@ package com.thomas.alib.excel.enums;
 /**
  * 边框类型
  */
-public enum BorderType {
+public enum SEBorderStyle {
+    NOT_SET,//不设置
     NONE,//无
     THIN,//细线
     MEDIUM,//粗一点的线

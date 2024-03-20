@@ -15,6 +15,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
+/**
+ * Excel导入时处理每个工作表(Sheet)的解析工具
+ *
+ * @param <T> 数据源对象类型泛型
+ */
 class ExcelImportSheetItem<T> {
     Workbook mWorkbook;
     FormulaEvaluator formulaEvaluator;
