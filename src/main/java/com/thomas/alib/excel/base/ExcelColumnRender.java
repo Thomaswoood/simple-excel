@@ -3,6 +3,8 @@ package com.thomas.alib.excel.base;
 import com.thomas.alib.excel.annotation.ExcelColumn;
 import com.thomas.alib.excel.converter.*;
 import com.thomas.alib.excel.utils.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.time.LocalDate;
@@ -10,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 
 public class ExcelColumnRender {
+    private static Logger logger = LoggerFactory.getLogger(ExcelColumnRender.class);
     /**
      * 列属性信息
      */
@@ -102,6 +105,7 @@ public class ExcelColumnRender {
                         converter = excelColumn.converter().newInstance();
                     }
                 } catch (Throwable e) {//发生未知错误，使用默认转化器
+                    logger.error("表格\"" + headName + "\"列-在创建您配置的converter时发生错误，将使用默认方式继续处理，具体错误为:", e);
                     converter = new DefaultConverter();
                 }
             }

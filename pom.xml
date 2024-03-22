@@ -23,7 +23,8 @@
         <!--javax-servlet-->
         <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
         <!--日志-->
-        <logger.version>2.11.1</logger.version>
+        <slf4j.version>1.7.30</slf4j.version>
+        <logback.version>1.2.6</logback.version>
     </properties>
 
     <repositories>
@@ -74,9 +75,14 @@
         </dependency>
         <!--日志-->
         <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-            <version>${logger.version}</version>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
             <optional>true</optional>
         </dependency>
     </dependencies>

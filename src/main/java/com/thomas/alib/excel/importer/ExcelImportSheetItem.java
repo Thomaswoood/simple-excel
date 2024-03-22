@@ -4,6 +4,8 @@ import com.thomas.alib.excel.exception.AnalysisException;
 import com.thomas.alib.excel.utils.CollectionUtils;
 import com.thomas.alib.excel.utils.ReflectUtil;
 import org.apache.poi.ss.usermodel.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Valid;
@@ -21,6 +23,7 @@ import java.util.function.Consumer;
  * @param <T> 数据源对象类型泛型
  */
 class ExcelImportSheetItem<T> {
+    private static Logger logger = LoggerFactory.getLogger(ExcelImportSheetItem.class);
     Workbook mWorkbook;
     FormulaEvaluator formulaEvaluator;
     Sheet mSheet;
@@ -54,22 +57,21 @@ class ExcelImportSheetItem<T> {
             try {
                 t = dataClazz.newInstance();
                 boolean allValueIsNull = true;
-                for (ExcelImportColumnItem item : columnFieldItemMap.values()) {
-                    if (item.getColumnIndex() < 0) continue;
-                    Cell cell = row.getCell(item.getColumnIndex());
-                    Object value = item.setColumnValueFromCell(t, cell, formulaEvaluator);
-                    if (value != null) allValueIsNull = false;
+                for (ExcelImportColumnItem column : columnFieldItemMap.values()) {
+                    if (column.getColumnIndex() < 0) continue;
+                    try {
+                        Cell cell = row.getCell(column.getColumnIndex());
+                        Object value = column.setColumnValueFromCell(t, cell, formulaEvaluator);
+                        if (value != null) allValueIsNull = false;
+                    } catch (Throwable e) {
+                        throw new RuntimeException("表格\"" + column.getHeadName() + "\"列-第" + row_index + "行-解析时发生错误:", e);
+                    }
                 }
                 if (allValueIsNull) {
                     continue;//解析所有字段都是空，这行数据跳过
                 }
             } catch (Throwable e) {
-                if (e instanceof AnalysisException) {
-                    throw new RuntimeException("表格第" + row_index + "行:" + e.getLocalizedMessage());
-                } else {
-                    e.printStackTrace();
-                    throw new RuntimeException("表格第" + row_index + "行:解析时发生未知错误，请联系管理员", e);
-                }
+                throw new RuntimeException("表格第" + row_index + "行-解析时发生错误:", e);
             }
             Set<ConstraintViolation<@Valid T>> validateSet = Validation.buildDefaultValidatorFactory()
                     .getValidator()
@@ -101,18 +103,20 @@ class ExcelImportSheetItem<T> {
             try {
                 t = dataClazz.newInstance();
                 boolean allValueIsNull = true;
-                for (ExcelImportColumnItem item : columnFieldItemMap.values()) {
-                    if (item.getColumnIndex() < 0) continue;
+                for (ExcelImportColumnItem column : columnFieldItemMap.values()) {
+                    if (column.getColumnIndex() < 0) continue;
                     try {
-                        Cell cell = row.getCell(item.getColumnIndex());
-                        Object value = item.setColumnValueFromCell(t, cell, formulaEvaluator);
+                        Cell cell = row.getCell(column.getColumnIndex());
+                        Object value = column.setColumnValueFromCell(t, cell, formulaEvaluator);
                         if (value != null) allValueIsNull = false;
                     } catch (Throwable e) {
+                        String e_label = "表格\"" + column.getHeadName() + "\"列-第" + row_index + "行-解析时发生错误:";
+                        logger.error(e_label, e);
                         safety.setReadSuccess(false);
                         if (e instanceof AnalysisException) {
-                            safety.appendMsg("表格第" + row_index + "行:" + e.getLocalizedMessage() + ";");
+                            safety.appendMsg(e_label + e.getLocalizedMessage() + ";");
                         } else {
-                            safety.appendMsg("表格第" + row_index + "行:解析时发生未知错误，请联系管理员;");
+                            safety.appendMsg(e_label + "未知错误，请联系管理员;");
                         }
                     }
                 }
@@ -120,9 +124,11 @@ class ExcelImportSheetItem<T> {
                     continue;//解析所有字段都是空，这行数据跳过
                 }
             } catch (Throwable e) {
+                String e_label = "表格第" + row_index + "行-解析时发生错误:";
+                logger.error(e_label, e);
                 t = null;
                 safety.setReadSuccess(false);
-                safety.appendMsg("表格第" + row_index + "行:解析时发生未知错误，请联系管理员;");
+                safety.appendMsg(e_label + "未知错误，请联系管理员;");
             }
             safety.setData(t);
             if (t != null) {
@@ -142,7 +148,8 @@ class ExcelImportSheetItem<T> {
             if (consumer != null) {
                 try {
                     consumer.accept(safety);
-                } catch (Throwable ignore) {
+                } catch (Throwable e) {
+                    logger.error("表格第" + row_index + "行-回调时发生错误:", e);
                 }
             }
             result.add(safety);
@@ -160,17 +167,17 @@ class ExcelImportSheetItem<T> {
         List<Field> total_field_list = ReflectUtil.getAccessibleFieldIncludeSuper(dataClazz);
         //遍历寻找所有有效column成员
         for (Field item_field : total_field_list) {
-            ExcelImportColumnItem item_column_field = new ExcelImportColumnItem(item_field);
-            if (item_column_field.isValid() && !item_column_field.isPicture()) {//有效且不按图片处理
-                columnFieldItemMap.put(item_column_field.getHeadName(), item_column_field);
+            ExcelImportColumnItem column = new ExcelImportColumnItem(item_field);
+            if (column.isValid() && !column.isPicture()) {//有效且不按图片处理
+                columnFieldItemMap.put(column.getHeadName(), column);
             }
         }
         int first_cell = row.getFirstCellNum(), last_cell = row.getLastCellNum();
         for (int cell_index = first_cell; cell_index < last_cell; ++cell_index) {//遍历表头行
             Cell cell = row.getCell(cell_index);
-            ExcelImportColumnItem item_column_field = columnFieldItemMap.get(readHeadCell(cell));
-            if (item_column_field != null) {
-                item_column_field.setColumnIndex(cell_index);
+            ExcelImportColumnItem column = columnFieldItemMap.get(readHeadCell(cell));
+            if (column != null) {
+                column.setColumnIndex(cell_index);
             }
         }
     }

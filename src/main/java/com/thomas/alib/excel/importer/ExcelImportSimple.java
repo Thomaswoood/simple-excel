@@ -4,6 +4,8 @@ import com.thomas.alib.excel.interfaces.EFunction;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.InputStream;
@@ -15,6 +17,7 @@ import java.util.function.BiConsumer;
  * Excel导入工具类
  */
 public class ExcelImportSimple {
+    private static Logger logger = LoggerFactory.getLogger(ExcelImportSimple.class);
 
     /**
      * 读取excel文件总行数
@@ -81,7 +84,8 @@ public class ExcelImportSimple {
         }
         try {
             wb.close();
-        } catch (Throwable ignore) {
+        } catch (Throwable e) {
+            logger.error("表格关闭Workbook时发生错误:", e);
         }
         return totalLine;
     }
@@ -158,7 +162,8 @@ public class ExcelImportSimple {
         }
         try {
             wb.close();
-        } catch (Throwable ignore) {
+        } catch (Throwable e) {
+            logger.error("表格关闭Workbook时发生错误:", e);
         }
         return result;
     }
@@ -219,6 +224,7 @@ public class ExcelImportSimple {
         try {
             wb = WorkbookFactory.create(inputStreamGetFunc.apply(inputStreamSource));
         } catch (Exception e) {
+            logger.error("表格安全模式下，根据输入信息读取Workbook对象时发生错误:", e);
             result.appendMsg("文件读取失败;" + e.getLocalizedMessage());
             result.setReadSuccess(false);
             return result;
@@ -242,6 +248,7 @@ public class ExcelImportSimple {
         try {
             wb = WorkbookFactory.create(inputStream);
         } catch (Exception e) {
+            logger.error("表格安全模式下，根据输入流读取Workbook对象时发生错误:", e);
             result.appendMsg("文件读取失败;" + e.getLocalizedMessage());
             result.setReadSuccess(false);
             return result;
@@ -265,6 +272,7 @@ public class ExcelImportSimple {
         try {
             wb = WorkbookFactory.create(file);
         } catch (Exception e) {
+            logger.error("表格安全模式下，根据输入文件读取Workbook对象时发生错误:", e);
             result.appendMsg("文件读取失败;" + e.getLocalizedMessage());
             result.setReadSuccess(false);
             return result;
@@ -295,7 +303,8 @@ public class ExcelImportSimple {
         }
         try {
             wb.close();
-        } catch (Throwable ignore) {
+        } catch (Throwable e) {
+            logger.error("表格关闭Workbook时发生错误:", e);
         }
         return result;
     }

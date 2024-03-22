@@ -3,6 +3,8 @@ package com.thomas.alib.excel.exporter;
 
 import com.thomas.alib.excel.utils.CollectionUtils;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -15,6 +17,7 @@ import java.util.List;
  * @param <C> 子类泛型，用于链式调用
  */
 public abstract class ExcelExporterBase<C extends ExcelExporterBase<C>> {
+    private static Logger logger = LoggerFactory.getLogger(ExcelExporterBase.class);
     final SXSSFWorkbook sxssfWorkbook;
     final List<ExcelExportSheetItem<?>> sheetItemList;
     C child;
@@ -173,6 +176,7 @@ public abstract class ExcelExporterBase<C extends ExcelExporterBase<C>> {
                     os.close();
                 }
             } catch (IOException e) {
+                logger.error("表格export关闭输出流时发生错误:", e);
                 System.err.println(e.getMessage());
             }
 

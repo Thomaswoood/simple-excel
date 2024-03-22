@@ -8,6 +8,8 @@ import com.thomas.alib.excel.utils.StringUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -20,6 +22,7 @@ import java.util.List;
  * @param <T> 数据源对象类型泛型
  */
 class ExcelExportSheetItem<T> {
+    private static Logger logger = LoggerFactory.getLogger(ExcelExportSheetItem.class);
     /**
      * excel导出构建对象
      */
@@ -137,9 +140,9 @@ class ExcelExportSheetItem<T> {
         totalFieldList = ReflectUtil.getAccessibleFieldIncludeSuper(sheetDataClazz);//全部的成员列表
         excelColumnList = new ArrayList<>();//解析成员为excel列信息列表
         for (Field item_field : totalFieldList) {//遍历寻找所有有效column成员
-            ExcelExportColumnItem item_column_field = new ExcelExportColumnItem(item_field, sxssfWorkbook, head_style_processor, data_style_processor);
-            if (item_column_field.isValid()) //有效
-                excelColumnList.add(item_column_field);
+            ExcelExportColumnItem column = new ExcelExportColumnItem(item_field, sxssfWorkbook, head_style_processor, data_style_processor);
+            if (column.isValid()) //有效
+                excelColumnList.add(column);
         }
         //给列排序
         switch (columnSortType) {
@@ -183,14 +186,15 @@ class ExcelExportSheetItem<T> {
         if (!CollectionUtils.isEmpty(sourceList)) {
             //创建并填充每行数据信息
             for (int i = 0; i < sourceList.size(); i++) {//创建每一行数据
+                int row_index = i + 1;//行序号
                 T item_source = sourceList.get(i);//逐个取出数据源
-                Row dataRow = sheet.createRow(i + 1);//创建数据行
+                Row dataRow = sheet.createRow(row_index);//创建数据行
                 //设置数据行高
                 if (dataRowHeight > 0) dataRow.setHeight(dataRowHeight);
                 r_i = 0;//每新开始一行，重置row计数
                 if (showIndex) {//如果需要默认显示序号
                     Cell cell = dataRow.createCell(r_i);
-                    cell.setCellValue(i + 1);
+                    cell.setCellValue(row_index);
                     if (dataStyle != null) cell.setCellStyle(dataStyle);
                     r_i++;
                 }
@@ -198,22 +202,23 @@ class ExcelExportSheetItem<T> {
                     Cell cell = dataRow.createCell(r_i);
                     if (column.isPicture()) {
                         try {
-                            byte[] pictureBytes = column.getColumnPictureBytesFromSource(item_source);
+                            byte[] pictureBytes = column.getColumnPictureBytesFromSource(item_source, row_index);
                             if (pictureBytes == null) {
-                                cell.setCellValue("图片： " + column.getColumnValueFromSource(item_source) + "  加载失败");
+                                cell.setCellValue("图片： " + column.getColumnValueFromSource(item_source, row_index) + "  加载失败");
                             } else {
                                 Drawing drawing = sheet.getDrawingPatriarch();
                                 if (drawing == null) drawing = sheet.createDrawingPatriarch();
-                                ClientAnchor clientAnchor = drawing.createAnchor(0, 0, 0, 0, r_i, i + 1, r_i + 1, i + 2);
+                                ClientAnchor clientAnchor = drawing.createAnchor(0, 0, 0, 0, r_i, row_index, r_i + 1, i + 2);
                                 int addPicture = sxssfWorkbook.addPicture(pictureBytes, SXSSFWorkbook.PICTURE_TYPE_JPEG);
                                 Picture picture = drawing.createPicture(clientAnchor, addPicture);
                                 picture.getPictureData();
                             }
                         } catch (Throwable e) {
-                            cell.setCellValue("图片： " + column.getColumnValueFromSource(item_source) + "  获取失败");
+                            logger.error("表格\"" + column.getHeadName() + "\"列-第" + row_index + "行-绘制图片时发生错误:", e);
+                            cell.setCellValue("图片： " + column.getColumnValueFromSource(item_source, row_index) + "  绘制失败");
                         }
                     } else {
-                        cell.setCellValue(column.getColumnValueFromSource(item_source));
+                        cell.setCellValue(column.getColumnValueFromSource(item_source, row_index));
                     }
                     if (column.getDataStyle() != null) {
                         cell.setCellStyle(column.getDataStyle());
