@@ -25,6 +25,7 @@ public class TestApplication {
         //示例
         generateTemplate();
         exportTest();
+        exportTest2();
         importTest();
         importTest1_0_2();
         importTestSafety();
@@ -42,9 +43,11 @@ public class TestApplication {
     }
 
     /**
-     * 导出示例
+     * 创建测试数据
+     *
+     * @return 测试数据列表
      */
-    public static void exportTest() {
+    public static List<YourDataBean> makeTestData() {
         LocalDate now = LocalDate.now();
         List<YourDataBean> exportList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
@@ -52,8 +55,25 @@ public class TestApplication {
                     "https://img2.woyaogexing.com/2023/03/06/1cfcb6418f13f881269aae6cff8bce16.jpg");
             exportList.add(item);
         }
+        return exportList;
+    }
+
+    /**
+     * 导出示例
+     */
+    public static void exportTest() {
         ExcelExportSimple.with(new File("target/output/exportTest.xlsx"))
-                .addSheet(exportList)
+                .addSheet(makeTestData())
+                .export();
+        System.out.println("导出示例执行完毕");
+    }
+
+    /**
+     * 导出示例2
+     */
+    public static void exportTest2() {
+        ExcelExportSimple.with("target/output/exportTest.xlsx")
+                .addSheet(makeTestData())
                 .export();
         System.out.println("导出示例执行完毕");
     }

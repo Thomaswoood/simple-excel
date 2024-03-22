@@ -1,5 +1,9 @@
-package com.thomas.alib.excel.exporter;
+package com.thomas.alib.excel.exporter.provider;
 
+
+import com.thomas.alib.excel.exporter.ExcelExporterBase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -8,7 +12,8 @@ import java.io.OutputStream;
 /**
  * Excel导出者：针对直接导出为File文件的版本，主要负责处理File类和输出流的交互
  */
-public class ExcelExporterFile extends ExcelExporterBase<ExcelExporterFile> {
+public class ExcelExporterByFile extends ExcelExporterBase<ExcelExporterByFile> {
+    private static Logger logger = LoggerFactory.getLogger(ExcelExporterByFile.class);
     private File file;
 
     /**
@@ -16,18 +21,19 @@ public class ExcelExporterFile extends ExcelExporterBase<ExcelExporterFile> {
      *
      * @param file 本次导出对应输出的文件
      */
-    ExcelExporterFile(File file) {
+    public ExcelExporterByFile(File file) {
         super();
         this.file = file;
+        //没传入文件，默认在临时文件夹处理
+        if (this.file == null) {
+            this.file = new File(System.getProperty("java.io.tmpdir"), System.currentTimeMillis() + ".xlsx");
+        }
         this.child = this;
     }
 
     @Override
-    OutputStream getOutputStream() throws Exception {
-        //没传入文件，默认在临时文件夹处理
-        if (file == null) {
-            file = new File(System.getProperty("java.io.tmpdir"), System.currentTimeMillis() + ".xlsx");
-        }
+    protected OutputStream getOutputStream() throws Exception {
+        logger.debug("文件将被导出到：" + file.getAbsolutePath());
         //检查指定文件目录是否存在，不存在则创建
         File parent = file.getParentFile();
         if (!parent.exists()) {

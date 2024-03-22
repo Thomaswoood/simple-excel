@@ -20,12 +20,12 @@ public abstract class ExcelExporterBase<C extends ExcelExporterBase<C>> {
     private static Logger logger = LoggerFactory.getLogger(ExcelExporterBase.class);
     final SXSSFWorkbook sxssfWorkbook;
     final List<ExcelExportSheetItem<?>> sheetItemList;
-    C child;
+    protected C child;
 
     /**
      * 构造方法
      */
-    ExcelExporterBase() {
+    protected ExcelExporterBase() {
         this.sxssfWorkbook = new SXSSFWorkbook();
         this.sheetItemList = new ArrayList<>();
     }
@@ -155,7 +155,7 @@ public abstract class ExcelExporterBase<C extends ExcelExporterBase<C>> {
         return child;
     }
 
-    abstract OutputStream getOutputStream() throws Exception;
+    protected abstract OutputStream getOutputStream() throws Exception;
 
     /**
      * 开始生成并输出返回

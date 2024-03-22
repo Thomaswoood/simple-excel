@@ -1,7 +1,8 @@
-package com.thomas.alib.excel.exporter;
+package com.thomas.alib.excel.exporter.provider;
 
 
 
+import com.thomas.alib.excel.exporter.ExcelExporterBase;
 import com.thomas.alib.excel.utils.StringUtils;
 
 import javax.servlet.http.HttpServletResponse;
@@ -10,7 +11,7 @@ import java.io.OutputStream;
 /**
  * Excel导出者：针对http请求的response版本，主要负责处理response类和输出流的交互
  */
-public class ExcelExporterResponse extends ExcelExporterBase<ExcelExporterResponse> {
+public class ExcelExporterByResponse extends ExcelExporterBase<ExcelExporterByResponse> {
     String fileName;
     private final HttpServletResponse response;
 
@@ -19,7 +20,7 @@ public class ExcelExporterResponse extends ExcelExporterBase<ExcelExporterRespon
      *
      * @param response 本次导出请求对应的response
      */
-    ExcelExporterResponse(HttpServletResponse response) {
+    public ExcelExporterByResponse(HttpServletResponse response) {
         super();
         this.response = response;
         this.child = this;
@@ -31,13 +32,13 @@ public class ExcelExporterResponse extends ExcelExporterBase<ExcelExporterRespon
      * @param fileName 文件名
      * @return 链式调用，返回自身
      */
-    public ExcelExporterResponse fileName(String fileName) {
+    public ExcelExporterByResponse fileName(String fileName) {
         this.fileName = fileName;
         return this;
     }
 
     @Override
-    OutputStream getOutputStream() throws Exception {
+    protected OutputStream getOutputStream() throws Exception {
         if (StringUtils.isEmpty(fileName)) {
             fileName = System.currentTimeMillis() + ".xlsx";
         }
