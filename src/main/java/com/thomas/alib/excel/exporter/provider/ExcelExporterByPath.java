@@ -43,11 +43,18 @@ public class ExcelExporterByPath extends ExcelExporterBase<ExcelExporterByPath> 
     }
 
     @Override
-    protected OutputStream getOutputStream() throws IOException {
+    protected OutputStream getOutputStream() throws Exception {
         logger.debug("文件将被导出到：" + path.toAbsolutePath());
-        // 检查指定文件是否存在，存在先删除
-        if (Files.exists(path)) {
-            Files.delete(path);
+        // 检查目录是否存在
+        Path parent = path.getParent();
+        if (parent != null && !Files.exists(parent)) {
+            // 如果目录不存在，则创建目录
+            Files.createDirectories(parent);
+        } else {
+            // 目录存在(或无法获取到目录)，检查指定文件是否存在，存在先删
+            if (Files.exists(path)) {
+                Files.delete(path);
+            }
         }
         // 生成导出文件，如果文件所在目录不存在，会自动创建
         return Files.newOutputStream(path);
