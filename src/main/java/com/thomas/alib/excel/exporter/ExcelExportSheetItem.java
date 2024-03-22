@@ -183,6 +183,7 @@ class ExcelExportSheetItem<T> {
             sheet.setColumnWidth(r_i, column.getColumnWidth());
             r_i++;
         }
+        logger.debug("表头行处理完成");
         if (!CollectionUtils.isEmpty(sourceList)) {
             //创建并填充每行数据信息
             for (int i = 0; i < sourceList.size(); i++) {//创建每一行数据
@@ -227,8 +228,10 @@ class ExcelExportSheetItem<T> {
                     }
                     r_i++;
                 }
+                logger.debug("表格第" + row_index + "行处理完成");
             }
         }
+        logger.debug("数据行处理完成");
     }
 
     /**

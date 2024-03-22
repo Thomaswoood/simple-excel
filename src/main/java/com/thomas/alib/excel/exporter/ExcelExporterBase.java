@@ -150,7 +150,9 @@ public abstract class ExcelExporterBase<C extends ExcelExporterBase<C>> {
      */
     public <T> C createSheet(List<T> dataList, Class<T> dataClazz, Boolean show_index, String sheet_name) {
         ExcelExportSheetItem<T> sheetItem = new ExcelExportSheetItem<>(sxssfWorkbook, dataList, dataClazz, show_index, sheet_name);
+        logger.debug(sheetItem.sheetName() + "sheet页签准备处理数据");
         sheetItem.writeData();
+        logger.debug(sheetItem.sheetName() + "sheet页签数据处理完成");
         sheetItemList.add(sheetItem);
         return child;
     }
@@ -163,6 +165,7 @@ public abstract class ExcelExporterBase<C extends ExcelExporterBase<C>> {
     public void export() {
         if (CollectionUtils.isEmpty(sheetItemList))
             throw new RuntimeException("导出数据为空");
+        logger.debug("导出数据处理完毕，开始输出到指定的流中。");
         OutputStream os = null;
         try {
             os = getOutputStream();
@@ -175,6 +178,7 @@ public abstract class ExcelExporterBase<C extends ExcelExporterBase<C>> {
                     os.flush();
                     os.close();
                 }
+                logger.debug("导出数据输出完毕。");
             } catch (IOException e) {
                 logger.error("表格export关闭输出流时发生错误:", e);
                 System.err.println(e.getMessage());

@@ -4,6 +4,8 @@ package com.thomas.alib.excel.exporter;
 import com.thomas.alib.excel.exporter.provider.ExcelExporterByFile;
 import com.thomas.alib.excel.exporter.provider.ExcelExporterByPath;
 import com.thomas.alib.excel.exporter.provider.ExcelExporterByResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
@@ -13,6 +15,7 @@ import java.nio.file.Path;
  * Excel导出工具类
  */
 public class ExcelExportSimple {
+    private static Logger logger = LoggerFactory.getLogger(ExcelExportSimple.class);
 
     /**
      * 根据HttpServletResponse导出，直接导出到返回输出流中
@@ -21,6 +24,7 @@ public class ExcelExportSimple {
      * @return 导出执行对象
      */
     public static ExcelExporterByResponse with(HttpServletResponse response) {
+        logger.debug("基于response的导出开始");
         return new ExcelExporterByResponse(response);
     }
 
@@ -31,6 +35,7 @@ public class ExcelExportSimple {
      * @return 导出执行对象
      */
     public static ExcelExporterByFile with(File file) {
+        logger.debug("基于file的导出开始");
         return new ExcelExporterByFile(file);
     }
 
@@ -41,6 +46,7 @@ public class ExcelExportSimple {
      * @return 导出执行对象
      */
     public static ExcelExporterByPath with(Path path) {
+        logger.debug("基于path的导出开始");
         return new ExcelExporterByPath(path);
     }
 
@@ -51,6 +57,7 @@ public class ExcelExportSimple {
      * @return 导出执行对象
      */
     public static ExcelExporterByPath with(String path) {
+        logger.debug("基于路径的导出开始");
         return new ExcelExporterByPath(path);
     }
 }
