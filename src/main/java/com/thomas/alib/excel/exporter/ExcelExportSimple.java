@@ -2,12 +2,12 @@ package com.thomas.alib.excel.exporter;
 
 
 import com.thomas.alib.excel.exporter.provider.ExcelExporterByFile;
+import com.thomas.alib.excel.exporter.provider.ExcelExporterByJakartaResponse;
 import com.thomas.alib.excel.exporter.provider.ExcelExporterByPath;
 import com.thomas.alib.excel.exporter.provider.ExcelExporterByResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.nio.file.Path;
 
@@ -23,9 +23,20 @@ public class ExcelExportSimple {
      * @param response 返回对象
      * @return 导出执行对象
      */
-    public static ExcelExporterByResponse with(HttpServletResponse response) {
+    public static ExcelExporterByResponse with(javax.servlet.http.HttpServletResponse response) {
         logger.debug("基于response的导出开始");
         return new ExcelExporterByResponse(response);
+    }
+
+    /**
+     * 根据HttpServletResponse导出，直接导出到返回输出流中
+     *
+     * @param response 返回对象
+     * @return 导出执行对象
+     */
+    public static ExcelExporterByJakartaResponse with(jakarta.servlet.http.HttpServletResponse response) {
+        logger.debug("基于response的导出开始");
+        return new ExcelExporterByJakartaResponse(response);
     }
 
     /**

@@ -1,15 +1,14 @@
 package com.thomas.alib.excel.importer;
 
 import com.thomas.alib.excel.exception.AnalysisException;
+import com.thomas.alib.excel.importer.validation.ImportValidator;
+import com.thomas.alib.excel.importer.validation.ImportValidatorFactory;
 import com.thomas.alib.excel.utils.CollectionUtils;
 import com.thomas.alib.excel.utils.ReflectUtil;
 import org.apache.poi.ss.usermodel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Valid;
-import javax.validation.Validation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,14 +21,36 @@ import java.util.function.Consumer;
  *
  * @param <T> 数据源对象类型泛型
  */
-class ExcelImportSheetItem<T> {
+class ExcelImportSheetItem<T> implements AutoCloseable {
     private static Logger logger = LoggerFactory.getLogger(ExcelImportSheetItem.class);
+    /**
+     * excel工作簿对象
+     */
     Workbook mWorkbook;
+    /**
+     * excel公式转换器
+     */
     FormulaEvaluator formulaEvaluator;
+    /**
+     * 本次处理的sheet对象
+     */
     Sheet mSheet;
+    /**
+     * 本次读取对应数据类的泛型
+     */
     Class<T> dataClazz;
+    /**
+     * 根据sheet表格的表头解析的数据列Map
+     */
     HashMap<String, ExcelImportColumnItem> columnFieldItemMap;
+    /**
+     * 本次处理的sheet所包含的总行数（包括所谓的表头行）
+     */
     int lineCount;
+    /**
+     * 导入时数据验证器
+     */
+    ImportValidator importValidator;
 
     ExcelImportSheetItem(Workbook workbook, Sheet sheet, Class<T> clazz) {
         this.mWorkbook = workbook;
@@ -38,6 +59,7 @@ class ExcelImportSheetItem<T> {
         this.dataClazz = clazz;
         this.columnFieldItemMap = new HashMap<>();
         this.lineCount = this.mSheet.getLastRowNum() - this.mSheet.getFirstRowNum();
+        this.importValidator = ImportValidatorFactory.build();
     }
 
     /**
@@ -73,11 +95,12 @@ class ExcelImportSheetItem<T> {
             } catch (Throwable e) {
                 throw new RuntimeException("表格第" + row_index + "行-解析时发生错误:", e);
             }
-            Set<ConstraintViolation<@Valid T>> validateSet = Validation.buildDefaultValidatorFactory()
-                    .getValidator()
-                    .validate(t);
-            if (!CollectionUtils.isEmpty(validateSet)) {
-                throw new RuntimeException("表格第" + row_index + "行:" + validateSet.iterator().next().getMessage());
+            //验证器存在才进行验证判断
+            if (importValidator != null) {
+                Set<String> validateSet = importValidator.validate(t);
+                if (!CollectionUtils.isEmpty(validateSet)) {
+                    throw new RuntimeException("表格第" + row_index + "行:" + validateSet.iterator().next());
+                }
             }
             result.add(t);
         }
@@ -131,17 +154,16 @@ class ExcelImportSheetItem<T> {
                 safety.appendMsg(e_label + "未知错误，请联系管理员;");
             }
             safety.setData(t);
-            if (t != null) {
-                Set<ConstraintViolation<@Valid T>> validateSet = Validation.buildDefaultValidatorFactory()
-                        .getValidator()
-                        .validate(t);
+            //验证对象不为空，且验证器存在才进行验证判断
+            if (t != null && importValidator != null) {
+                Set<String> validateSet = importValidator.validate(t);
                 if (!CollectionUtils.isEmpty(validateSet)) {
                     safety.setReadSuccess(false);
                     if (safety.getMsg().isEmpty()) {
                         safety.appendMsg("表格第" + row_index + "行:");
                     }
-                    for (ConstraintViolation<@Valid T> validate : validateSet) {
-                        safety.appendMsg(validate.getMessage() + ";");
+                    for (String validateMsg : validateSet) {
+                        safety.appendMsg(validateMsg + ";");
                     }
                 }
             }
@@ -210,5 +232,20 @@ class ExcelImportSheetItem<T> {
                 break;
         }
         return column;
+    }
+
+    /**
+     * 关闭，目前仅用于关闭验证器工厂
+     */
+    @Override
+    public void close() {
+        //如果验证器存在，关闭他
+        if (importValidator != null) {
+            try {
+                importValidator.close();
+            } catch (Throwable e) {
+                logger.error("验证器工厂关闭时发生错误:", e);
+            }
+        }
     }
 }

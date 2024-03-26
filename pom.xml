@@ -14,17 +14,19 @@
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
-        <!--poi excel-->
-        <poi.version>4.1.2</poi.version>
-        <!-- javax参数校验 -->
+        <!--excel 使用apache poi-->
+        <poi.version>5.2.5</poi.version>
+        <!-- validation参数校验 -->
         <javax.validation-api.version>2.0.1.Final</javax.validation-api.version>
-        <org.hibernate.validator.version>6.1.6.Final</org.hibernate.validator.version>
-        <javax.el.version>3.0.0</javax.el.version>
-        <!--javax-servlet-->
+        <jakarta.validation-api.version>3.0.2</jakarta.validation-api.version>
+        <org.hibernate.validator.version>7.0.5.Final</org.hibernate.validator.version>
+        <javax.el.version>4.0.2</javax.el.version>
+        <!--servlet-api，用于可以直接导出到response中，由容器提供-->
         <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
-        <!--日志-->
-        <slf4j.version>1.7.30</slf4j.version>
-        <logback.version>1.2.6</logback.version>
+        <jakarta.servlet-api.version>5.0.0</jakarta.servlet-api.version>
+        <!--日志，使用slf4j + log4j2方案，因为poi版本5之后引入了log4j2-->
+        <slf4j.version>1.7.32</slf4j.version>
+        <log4j2.version>2.14.1</log4j2.version>
     </properties>
 
     <repositories>
@@ -41,17 +43,24 @@
     </pluginRepositories>
 
     <dependencies>
-        <!--excel-->
+        <!--excel 使用apache poi-->
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
             <version>${poi.version}</version>
+            <optional>true</optional>
         </dependency>
-        <!-- javax参数校验 -->
+        <!-- validation参数校验 -->
         <dependency>
             <groupId>javax.validation</groupId>
             <artifactId>validation-api</artifactId>
             <version>${javax.validation-api.version}</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+            <version>${jakarta.validation-api.version}</version>
             <optional>true</optional>
         </dependency>
         <dependency>
@@ -62,27 +71,42 @@
         </dependency>
         <dependency>
             <groupId>org.glassfish</groupId>
-            <artifactId>javax.el</artifactId>
+            <artifactId>jakarta.el</artifactId>
             <version>${javax.el.version}</version>
             <optional>true</optional>
         </dependency>
-        <!--javax-servlet-->
+        <!--servlet-api，用于可以直接导出到response中，由容器提供-->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>${javax.servlet-api.version}</version>
+            <scope>provided</scope>
             <optional>true</optional>
         </dependency>
-        <!--日志-->
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>${jakarta.servlet-api.version}</version>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+        <!--日志，使用slf4j + log4j2方案，因为poi版本5之后引入了log4j2-->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>${slf4j.version}</version>
+            <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>${logback.version}</version>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>${log4j2.version}</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+            <version>${log4j2.version}</version>
             <optional>true</optional>
         </dependency>
     </dependencies>

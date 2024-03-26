@@ -3,6 +3,8 @@ package com.thomas.alib.excel.test;
 import com.thomas.alib.excel.exporter.ExcelExportSimple;
 import com.thomas.alib.excel.importer.ExcelImportSimple;
 import com.thomas.alib.excel.importer.SafetyResult;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.config.Configurator;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,6 +17,8 @@ import java.util.List;
  */
 public class TestApplication {
     public static void main(String[] args) {
+        // 设置日志级别为DEBUG
+        Configurator.setRootLevel(Level.DEBUG);
         // 将日志输出到控制台
         System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug");
         System.setProperty("org.slf4j.simpleLogger.showDateTime", "true");
