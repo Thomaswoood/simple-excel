@@ -3,9 +3,9 @@
 ## 介绍
 基于apache.poi二次开发，使用注解方式调用poi针对excel处理的常用api。支持根据List<?>和配置的注解进行导入导出。
 注解支持自动序号、列排序、行高、列宽、前后缀处理、自定义转化器处理、图片加载、字体对齐边框等基本样式处理。
-支持通过javax.validation进行导入参数校验。
+支持通过javax.validation或jakarta.validation进行导入参数校验。
 
-现在迎来了全新的2.0.0版本：重构了导出样式处理器；支持叠加设置多套样式；支持在@ExcelSheet和@ExcelColumn注解中使用样式的组合注解@ExcelStyle；
+现在迎来了全新的2.x.x版本：重构了导出样式处理器；支持叠加设置多套样式；支持在@ExcelSheet和@ExcelColumn注解中使用样式的组合注解@ExcelStyle；
 支持直接导出到指定路径或Path；集成了日志门面slf4j，您可以自行选择您要使用的日志实现库；细化了异常捕获和日志打印逻辑，方便您定位问题所在。
 
 您可以在@ExcelSheet中设置全局通用的基础样式baseStyle，单独给表头行使用的headStyle，单独给数据行使用的dataStyle，他们都会继承或覆盖baseStyle中设置的样式。
@@ -27,7 +27,7 @@
 <dependency>
     <groupId>io.github.Thomaswoood</groupId>
     <artifactId>simple-excel</artifactId>
-    <version>2.0.0</version>
+    <version>2.1.0</version>
 </dependency>
 ```
 
@@ -53,7 +53,7 @@ public class YourDataBean {
 
 > 导出示例：
 
-1. 将Excel直接导出至response流中：
+1. 将Excel直接导出至response流中，response对象可以是javax.servlet.http.HttpServletResponse，也可以是jakarta.servlet.http.HttpServletResponse，这取决于您的容器，这个工具会自动适应：
 
 ```
 ExcelExportSimple.with(response)
