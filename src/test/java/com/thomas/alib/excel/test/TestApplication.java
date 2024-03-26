@@ -1,6 +1,7 @@
 package com.thomas.alib.excel.test;
 
-import com.thomas.alib.excel.exporter.ExcelExportSimple;
+import com.thomas.alib.excel.exporter.provider.ExcelExport2File;
+import com.thomas.alib.excel.exporter.provider.ExcelExport2Path;
 import com.thomas.alib.excel.importer.ExcelImportSimple;
 import com.thomas.alib.excel.importer.SafetyResult;
 import org.apache.logging.log4j.Level;
@@ -40,7 +41,7 @@ public class TestApplication {
      * 使用导出工具，根据实体类生成一个模板实例
      */
     public static void generateTemplate() {
-        ExcelExportSimple.with(new File("target/output/template.xlsx"))
+        ExcelExport2File.with(new File("target/output/template.xlsx"))
                 .createEmptySheet(YourDataBean.class)
                 .export();
         System.out.println("生成模板示例执行完毕");
@@ -66,7 +67,7 @@ public class TestApplication {
      * 导出示例
      */
     public static void exportTest() {
-        ExcelExportSimple.with(new File("target/output/exportTest.xlsx"))
+        ExcelExport2File.with(new File("target/output/exportTest.xlsx"))
                 .addSheet(makeTestData())
                 .export();
         System.out.println("导出示例执行完毕");
@@ -76,7 +77,7 @@ public class TestApplication {
      * 导出示例2
      */
     public static void exportTest2() {
-        ExcelExportSimple.with("target/output/exportTest.xlsx")
+        ExcelExport2Path.with("target/output/exportTest.xlsx")
                 .addSheet(makeTestData())
                 .export();
         System.out.println("导出示例执行完毕");

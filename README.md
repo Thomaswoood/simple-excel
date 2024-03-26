@@ -27,7 +27,19 @@
 <dependency>
     <groupId>io.github.Thomaswoood</groupId>
     <artifactId>simple-excel</artifactId>
-    <version>2.1.0</version>
+    <version>2.1.2</version>
+</dependency>
+<!--需要引入apache-poi 支持4.1.2至5.2.5版本-->
+<dependency>
+    <groupId>org.apache.poi</groupId>
+    <artifactId>poi-ooxml</artifactId>
+    <version>5.2.5</version>
+</dependency>
+<!--需要日志门面slf4j-->
+<dependency>
+    <groupId>org.slf4j</groupId>
+    <artifactId>slf4j-api</artifactId>
+    <version>1.7.25</version>
 </dependency>
 ```
 
@@ -53,10 +65,16 @@ public class YourDataBean {
 
 > 导出示例：
 
-1. 将Excel直接导出至response流中，response对象可以是javax.servlet.http.HttpServletResponse，也可以是jakarta.servlet.http.HttpServletResponse，这取决于您的容器，这个工具会自动适应：
+1. 将Excel直接导出至response流中:：
 
 ```
-ExcelExportSimple.with(response)
+// response对象可以是javax.servlet.http.HttpServletResponse
+ExcelExport2JavaxResponse.with(response)
+                .addSheet(exportList)
+                .fileName("自定义文件名.xlsx")
+                .export();
+// response对象也可以是jakarta.servlet.http.HttpServletResponse
+ExcelExport2JavaxResponse.with(response)
                 .addSheet(exportList)
                 .fileName("自定义文件名.xlsx")
                 .export();
@@ -65,15 +83,24 @@ ExcelExportSimple.with(response)
 2. 将Excel导出至指定File中：
 
 ```
-ExcelExportSimple.with(File)
+ExcelExport2File.with(File)
                 .addSheet(exportList)
                 .export();
 ```
 
-3将Excel导出至指定路径中：
+3. 将Excel导出至指定路径中：
 
 ```
-ExcelExportSimple.with("/data/test.xlxs")
+ExcelExport2Path.with("/data/test.xlxs")
+                .addSheet(exportList)
+                .export();
+```
+
+4. 将Excel导出至指定的输出流中：
+
+```
+// source是导出的源，outputStreamProvider是根据source来获取输出流的方法
+ExcelExport2OutputStream.with(source, outputStreamProvider)
                 .addSheet(exportList)
                 .export();
 ```
