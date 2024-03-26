@@ -159,6 +159,7 @@ public class ExcelImportSimple {
         for (int i = 0; i < wb.getNumberOfSheets(); ++i) {//遍历sheet
             ExcelImportSheetItem<E> sheet = new ExcelImportSheetItem<>(wb, wb.getSheetAt(i), clazz);
             result.addAll(sheet.readList());
+            sheet.close();
         }
         try {
             wb.close();
@@ -300,6 +301,7 @@ public class ExcelImportSimple {
         for (ExcelImportSheetItem<E> sheet : sheetItemList) {
             long finalTotalLine = totalLine;
             result.getData().addAll(sheet.readListSafety(eSafetyResult -> consumer.accept(finalTotalLine, eSafetyResult)));
+            sheet.close();
         }
         try {
             wb.close();
