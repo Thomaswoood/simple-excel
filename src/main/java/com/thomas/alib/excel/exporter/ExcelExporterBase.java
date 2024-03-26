@@ -157,6 +157,12 @@ public abstract class ExcelExporterBase<C extends ExcelExporterBase<C>> {
         return child;
     }
 
+    /**
+     * 由子类提供具体导出的输出流
+     *
+     * @return 输出流对象
+     * @throws Exception 创建输出流时可能产生的异常，子类可直接抛出，由父类处理
+     */
     protected abstract OutputStream getOutputStream() throws Exception;
 
     /**

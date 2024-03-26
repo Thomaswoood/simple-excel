@@ -1,42 +1,40 @@
 package com.thomas.alib.excel.exporter;
 
 
-import com.thomas.alib.excel.exporter.provider.ExcelExporterByFile;
-import com.thomas.alib.excel.exporter.provider.ExcelExporterByJakartaResponse;
-import com.thomas.alib.excel.exporter.provider.ExcelExporterByPath;
-import com.thomas.alib.excel.exporter.provider.ExcelExporterByResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.thomas.alib.excel.exporter.provider.*;
+import com.thomas.alib.excel.interfaces.EFunction;
 
 import java.io.File;
+import java.io.OutputStream;
 import java.nio.file.Path;
 
 /**
  * Excel导出工具类
  */
 public class ExcelExportSimple {
-    private static Logger logger = LoggerFactory.getLogger(ExcelExportSimple.class);
 
     /**
      * 根据HttpServletResponse导出，直接导出到返回输出流中
+     * 此方法为尽量兼容历史版本的过渡方法，未来会废弃
      *
      * @param response 返回对象
      * @return 导出执行对象
      */
-    public static ExcelExporterByResponse with(javax.servlet.http.HttpServletResponse response) {
-        logger.debug("基于response的导出开始");
-        return new ExcelExporterByResponse(response);
+    @Deprecated
+    public static ExcelExport2JavaxResponse withJavaxResponse(Object response) {
+        return ExcelExport2JavaxResponse.withJavaxResponse(response);
     }
 
     /**
      * 根据HttpServletResponse导出，直接导出到返回输出流中
+     * 此方法为尽量兼容历史版本的过渡方法，未来会废弃
      *
      * @param response 返回对象
      * @return 导出执行对象
      */
-    public static ExcelExporterByJakartaResponse with(jakarta.servlet.http.HttpServletResponse response) {
-        logger.debug("基于response的导出开始");
-        return new ExcelExporterByJakartaResponse(response);
+    @Deprecated
+    public static ExcelExport2JakartaResponse withJakartaResponse(Object response) {
+        return ExcelExport2JakartaResponse.withJakartaResponse(response);
     }
 
     /**
@@ -45,9 +43,8 @@ public class ExcelExportSimple {
      * @param file 导出文件对象
      * @return 导出执行对象
      */
-    public static ExcelExporterByFile with(File file) {
-        logger.debug("基于file的导出开始");
-        return new ExcelExporterByFile(file);
+    public static ExcelExport2File with(File file) {
+        return ExcelExport2File.with(file);
     }
 
     /**
@@ -56,9 +53,8 @@ public class ExcelExportSimple {
      * @param path 导出文件路径
      * @return 导出执行对象
      */
-    public static ExcelExporterByPath with(Path path) {
-        logger.debug("基于path的导出开始");
-        return new ExcelExporterByPath(path);
+    public static ExcelExport2Path with(Path path) {
+        return ExcelExport2Path.with(path);
     }
 
     /**
@@ -67,8 +63,18 @@ public class ExcelExportSimple {
      * @param path 导出文件路径
      * @return 导出执行对象
      */
-    public static ExcelExporterByPath with(String path) {
-        logger.debug("基于路径的导出开始");
-        return new ExcelExporterByPath(path);
+    public static ExcelExport2Path with(String path) {
+        return ExcelExport2Path.with(path);
+    }
+
+    /**
+     * 根据输出流提供者导出，导出到提供的输出流中
+     *
+     * @param source               输出流来源对象
+     * @param outputStreamProvider 输出流提供者
+     * @return 导出执行对象
+     */
+    public static <E> ExcelExport2OutputStream<E> with(E source, EFunction<E, OutputStream> outputStreamProvider) {
+        return ExcelExport2OutputStream.with(source, outputStreamProvider);
     }
 }
