@@ -18,8 +18,8 @@ import java.util.List;
  */
 public abstract class ExcelExporterBase<C extends ExcelExporterBase<C>> {
     private static Logger logger = LoggerFactory.getLogger(ExcelExporterBase.class);
-    final SXSSFWorkbook sxssfWorkbook;
-    final List<ExcelExportSheetItem<?, C>> sheetItemList;
+    SXSSFWorkbook sxssfWorkbook;
+    List<ExcelExportSheetItem<?, C>> sheetItemList;
     protected ExcelExportSheetItem<?, C> currentSheetItem;
     protected C child;
 
@@ -175,9 +175,18 @@ public abstract class ExcelExporterBase<C extends ExcelExporterBase<C>> {
     protected abstract OutputStream getOutputStream() throws Exception;
 
     /**
-     * 开始生成并输出返回
+     * 开始生成并输出返回，导出后将自动销毁
      */
     public void export() {
+        export(true);
+    }
+
+    /**
+     * 开始生成并输出返回
+     *
+     * @param autoDestroy 是否自动销毁
+     */
+    public void export(boolean autoDestroy) {
         if (CollectionUtils.isEmpty(sheetItemList))
             throw new RuntimeException("导出数据为空");
         logger.debug("导出数据处理完毕，开始输出到指定的流中。");
@@ -193,12 +202,27 @@ public abstract class ExcelExporterBase<C extends ExcelExporterBase<C>> {
                     os.flush();
                     os.close();
                 }
-                logger.debug("导出数据输出完毕。");
             } catch (IOException e) {
                 logger.error("表格export关闭输出流时发生错误:", e);
-                System.err.println(e.getMessage());
             }
-
+            if (autoDestroy) destroy();
+            logger.debug("导出数据输出完毕。");
         }
+    }
+
+    /**
+     * 销毁
+     */
+    public void destroy() {
+        try {
+            sxssfWorkbook.close();
+        } catch (Throwable e) {
+            logger.error("表格关闭Workbook时发生错误:", e);
+        }
+        sxssfWorkbook = null;
+        sheetItemList.clear();
+        sheetItemList = null;
+        currentSheetItem = null;
+        child = null;
     }
 }

@@ -32,6 +32,12 @@ public class ExcelExport2File extends ExcelExporterBase<ExcelExport2File> {
         logger.debug("基于文件对象的导出开始");
     }
 
+    /**
+     * 提供具体导出的输出流
+     *
+     * @return 输出流对象
+     * @throws Exception 创建文件和输出流时可能产生异常
+     */
     @Override
     protected OutputStream getOutputStream() throws Exception {
         logger.debug("文件将被导出到：" + file.getAbsolutePath());
@@ -53,6 +59,15 @@ public class ExcelExport2File extends ExcelExporterBase<ExcelExport2File> {
             throw new RuntimeException("导出文件\"" + file.getAbsolutePath() + "\"创建失败，无法继续导出。");
         }
         return new FileOutputStream(file);
+    }
+
+    /**
+     * 销毁
+     */
+    @Override
+    public void destroy() {
+        super.destroy();
+        file = null;
     }
 
     /**

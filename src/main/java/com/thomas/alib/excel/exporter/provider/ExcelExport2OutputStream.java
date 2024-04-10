@@ -34,11 +34,27 @@ public class ExcelExport2OutputStream<T> extends ExcelExporterBase<ExcelExport2O
         this.child = this;
     }
 
+    /**
+     * 提供具体导出的输出流
+     *
+     * @return 输出流对象
+     * @throws Exception 从导出源获取输出流时可能产生异常
+     */
     @Override
     protected OutputStream getOutputStream() throws Exception {
         if (source == null || outputStreamProvider == null)
             throw new NullPointerException("需要提供导出源");
         return outputStreamProvider.apply(source);
+    }
+
+    /**
+     * 销毁
+     */
+    @Override
+    public void destroy() {
+        super.destroy();
+        source = null;
+        outputStreamProvider = null;
     }
 
     /**

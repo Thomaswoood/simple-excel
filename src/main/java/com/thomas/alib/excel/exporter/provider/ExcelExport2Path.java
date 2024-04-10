@@ -42,6 +42,12 @@ public class ExcelExport2Path extends ExcelExporterBase<ExcelExport2Path> {
         logger.debug("基于文件路径的导出开始");
     }
 
+    /**
+     * 提供具体导出的输出流
+     *
+     * @return 输出流对象
+     * @throws Exception 创建文件和输出流时可能产生异常
+     */
     @Override
     protected OutputStream getOutputStream() throws Exception {
         logger.debug("文件将被导出到：" + path.toAbsolutePath());
@@ -58,6 +64,15 @@ public class ExcelExport2Path extends ExcelExporterBase<ExcelExport2Path> {
         }
         // 生成导出文件，如果文件所在目录不存在，会自动创建
         return Files.newOutputStream(path);
+    }
+
+    /**
+     * 销毁
+     */
+    @Override
+    public void destroy() {
+        super.destroy();
+        path = null;
     }
 
     /**

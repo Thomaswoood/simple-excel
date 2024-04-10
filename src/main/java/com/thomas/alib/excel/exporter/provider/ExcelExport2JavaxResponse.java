@@ -17,11 +17,11 @@ public class ExcelExport2JavaxResponse extends ExcelExporterBase<ExcelExport2Jav
     /**
      * 导出到response中时，在返回头中的文件名
      */
-    String fileName;
+    private String fileName;
     /**
      * 导出源response
      */
-    private final HttpServletResponse response;
+    private HttpServletResponse response;
 
     /**
      * 构造方法
@@ -46,6 +46,12 @@ public class ExcelExport2JavaxResponse extends ExcelExporterBase<ExcelExport2Jav
         return this;
     }
 
+    /**
+     * 提供具体导出的输出流
+     *
+     * @return 输出流对象
+     * @throws Exception 获取response输出流时可能产生异常
+     */
     @Override
     protected OutputStream getOutputStream() throws Exception {
         if (StringUtils.isEmpty(fileName)) {
@@ -61,6 +67,16 @@ public class ExcelExport2JavaxResponse extends ExcelExporterBase<ExcelExport2Jav
         response.addHeader("Access-Control-Max-Age", "3600");
         response.setContentType("application/octet-stream");
         return response.getOutputStream();
+    }
+
+    /**
+     * 销毁
+     */
+    @Override
+    public void destroy() {
+        super.destroy();
+        fileName = null;
+        response = null;
     }
 
     /**
