@@ -15,11 +15,11 @@ public class ExcelExport2OutputStream<T> extends ExcelExporterBase<ExcelExport2O
     /**
      * 输出流来源对象
      */
-    private T source;
+    protected T source;
     /**
      * 输出流提供者
      */
-    private EFunction<T, OutputStream> outputStreamProvider;
+    protected EFunction<T, OutputStream> outputStreamProvider;
 
     /**
      * 构造方法
@@ -27,7 +27,7 @@ public class ExcelExport2OutputStream<T> extends ExcelExporterBase<ExcelExport2O
      * @param source               输出流来源对象
      * @param outputStreamProvider 输出流提供者
      */
-    private ExcelExport2OutputStream(T source, EFunction<T, OutputStream> outputStreamProvider) {
+    protected ExcelExport2OutputStream(T source, EFunction<T, OutputStream> outputStreamProvider) {
         super();
         this.source = source;
         this.outputStreamProvider = outputStreamProvider;

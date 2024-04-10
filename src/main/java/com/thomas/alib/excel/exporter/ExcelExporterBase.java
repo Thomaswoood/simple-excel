@@ -17,9 +17,9 @@ import java.util.List;
  * @param <C> 子类泛型，用于链式调用
  */
 public abstract class ExcelExporterBase<C extends ExcelExporterBase<C>> {
-    private static Logger logger = LoggerFactory.getLogger(ExcelExporterBase.class);
-    SXSSFWorkbook sxssfWorkbook;
-    List<ExcelExportSheetItem<?, C>> sheetItemList;
+    protected static Logger logger = LoggerFactory.getLogger(ExcelExporterBase.class);
+    protected SXSSFWorkbook sxssfWorkbook;
+    protected List<ExcelExportSheetItem<?, C>> sheetItemList;
     protected ExcelExportSheetItem<?, C> currentSheetItem;
     protected C child;
 

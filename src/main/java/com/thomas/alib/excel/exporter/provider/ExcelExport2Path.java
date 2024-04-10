@@ -15,15 +15,15 @@ import java.nio.file.Paths;
  * Excel导出者：针对基于Path直接导出为文件的版本，主要负责处理Path对象和文件输出流的交互
  */
 public class ExcelExport2Path extends ExcelExporterBase<ExcelExport2Path> {
-    private static Logger logger = LoggerFactory.getLogger(ExcelExport2Path.class);
-    private Path path;
+    protected static Logger logger = LoggerFactory.getLogger(ExcelExport2Path.class);
+    protected Path path;
 
     /**
      * 构造方法
      *
      * @param filePath 本次导出对应输出的文件路径字符串
      */
-    private ExcelExport2Path(String filePath) {
+    protected ExcelExport2Path(String filePath) {
         this(StringUtils.isEmpty(filePath) ? null : Paths.get(filePath));
     }
 
@@ -32,7 +32,7 @@ public class ExcelExport2Path extends ExcelExporterBase<ExcelExport2Path> {
      *
      * @param path 本次导出对应输出的文件路径
      */
-    private ExcelExport2Path(Path path) {
+    protected ExcelExport2Path(Path path) {
         super();
         this.path = path;
         if (this.path == null) {
