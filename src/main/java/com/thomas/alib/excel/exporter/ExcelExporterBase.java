@@ -19,7 +19,8 @@ import java.util.List;
 public abstract class ExcelExporterBase<C extends ExcelExporterBase<C>> {
     private static Logger logger = LoggerFactory.getLogger(ExcelExporterBase.class);
     final SXSSFWorkbook sxssfWorkbook;
-    final List<ExcelExportSheetItem<?>> sheetItemList;
+    final List<ExcelExportSheetItem<?, C>> sheetItemList;
+    protected ExcelExportSheetItem<?, C> currentSheetItem;
     protected C child;
 
     /**
@@ -149,12 +150,20 @@ public abstract class ExcelExporterBase<C extends ExcelExporterBase<C>> {
      * @return 链式调用，返回自身
      */
     public <T> C createSheet(List<T> dataList, Class<T> dataClazz, Boolean show_index, String sheet_name) {
-        ExcelExportSheetItem<T> sheetItem = new ExcelExportSheetItem<>(sxssfWorkbook, dataList, dataClazz, show_index, sheet_name);
-        logger.debug(sheetItem.sheetName() + "sheet页签准备处理数据");
-        sheetItem.writeData();
-        logger.debug(sheetItem.sheetName() + "sheet页签数据处理完成");
-        sheetItemList.add(sheetItem);
+        currentSheetItem = new ExcelExportSheetItem<>(child, dataList, dataClazz, show_index, sheet_name);
+        currentSheetItem.writeData();
+        sheetItemList.add(currentSheetItem);
         return child;
+    }
+
+    /**
+     * 取得当前创建的sheet页签对象，可以调用sheet中的某些方法
+     * （目前暂无实际业务场景，为未来扩展预留的方法）
+     *
+     * @return 当前创建的sheet页签对象
+     */
+    public ExcelExportSheetItem<?, C> currentSheet() {
+        return currentSheetItem;
     }
 
     /**

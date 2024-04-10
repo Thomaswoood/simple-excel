@@ -21,12 +21,12 @@ import java.util.List;
  *
  * @param <T> 数据源对象类型泛型
  */
-class ExcelExportSheetItem<T> {
+public class ExcelExportSheetItem<T, EE extends ExcelExporterBase<EE>> {
     private static Logger logger = LoggerFactory.getLogger(ExcelExportSheetItem.class);
     /**
      * excel导出构建对象
      */
-    private SXSSFWorkbook sxssfWorkbook;
+    private EE excelExporter;
     /**
      * 数据源列表
      */
@@ -77,17 +77,17 @@ class ExcelExportSheetItem<T> {
     /**
      * 构造方法
      *
-     * @param sxssf_workbook   excel导出构建对象
+     * @param excel_exporter   excel导出构建对象
      * @param source_list      数据源列表
      * @param sheet_data_clazz 数据源泛型class
      * @param show_index       是否显示序号
      * @param sheet_name       外部设置的sheet名称，如果有值，则此值优先级比注解内的高
      */
-    ExcelExportSheetItem(SXSSFWorkbook sxssf_workbook, List<T> source_list, Class<T> sheet_data_clazz, Boolean show_index, String sheet_name) {
-        this.sxssfWorkbook = sxssf_workbook;
-        this.sourceList = source_list;
+    ExcelExportSheetItem(EE excel_exporter, List<T> source_list, Class<T> sheet_data_clazz, Boolean show_index, String sheet_name) {
+        excelExporter = excel_exporter;
+        sourceList = source_list;
         //获取数据类型
-        this.sheetDataClazz = sheet_data_clazz;
+        sheetDataClazz = sheet_data_clazz;
         if (sheetDataClazz == null) throw new RuntimeException("获取导出数据类型失败");
         //取得表格sheet相关注解
         ExcelSheet excel_sheet = sheetDataClazz.getAnnotation(ExcelSheet.class);
@@ -131,16 +131,16 @@ class ExcelExportSheetItem<T> {
             dataRowHeight = excel_sheet.dataRowHeight();//数据行高度
             //读取表头行样式
             head_style_processor = ExcelExportStyleProcessor.read(excel_sheet.baseStyle()).coverBySourceExceptNotSet(excel_sheet.headStyle());
-            headStyle = head_style_processor.getXSSFCellStyle(sxssfWorkbook);
+            headStyle = head_style_processor.getXSSFCellStyle(excelExporter.sxssfWorkbook);
             //读取数据行样式
             data_style_processor = ExcelExportStyleProcessor.read(excel_sheet.baseStyle()).coverBySourceExceptNotSet(excel_sheet.dataStyle());
-            dataStyle = data_style_processor.getXSSFCellStyle(sxssfWorkbook);
+            dataStyle = data_style_processor.getXSSFCellStyle(excelExporter.sxssfWorkbook);
         }
         //解析全部成员属性
         totalFieldList = ReflectUtil.getAccessibleFieldIncludeSuper(sheetDataClazz);//全部的成员列表
         excelColumnList = new ArrayList<>();//解析成员为excel列信息列表
         for (Field item_field : totalFieldList) {//遍历寻找所有有效column成员
-            ExcelExportColumnItem column = new ExcelExportColumnItem(item_field, sxssfWorkbook, head_style_processor, data_style_processor);
+            ExcelExportColumnItem column = new ExcelExportColumnItem(item_field, excelExporter.sxssfWorkbook, head_style_processor, data_style_processor);
             if (column.isValid()) //有效
                 excelColumnList.add(column);
         }
@@ -158,8 +158,9 @@ class ExcelExportSheetItem<T> {
      * 初始化sheet并设置数据到sheet中
      */
     void writeData() {
+        logger.debug(sheetName() + "sheet页签准备处理数据");
         //根据解析信息创建excel数据
-        Sheet sheet = sxssfWorkbook.createSheet(sheetName());//创建sheet对象
+        Sheet sheet = excelExporter.sxssfWorkbook.createSheet(sheetName());//创建sheet对象
         //创建并填充表头信息
         Row headRow = sheet.createRow(0);//创建表头
         //设置表头行高
@@ -210,7 +211,7 @@ class ExcelExportSheetItem<T> {
                                 Drawing drawing = sheet.getDrawingPatriarch();
                                 if (drawing == null) drawing = sheet.createDrawingPatriarch();
                                 ClientAnchor clientAnchor = drawing.createAnchor(0, 0, 0, 0, r_i, row_index, r_i + 1, i + 2);
-                                int addPicture = sxssfWorkbook.addPicture(pictureBytes, SXSSFWorkbook.PICTURE_TYPE_JPEG);
+                                int addPicture = excelExporter.sxssfWorkbook.addPicture(pictureBytes, SXSSFWorkbook.PICTURE_TYPE_JPEG);
                                 Picture picture = drawing.createPicture(clientAnchor, addPicture);
                                 picture.getPictureData();
                             }
@@ -232,6 +233,7 @@ class ExcelExportSheetItem<T> {
             }
         }
         logger.debug("数据行处理完成");
+        logger.debug(sheetName() + "sheet页签数据处理完成");
     }
 
     /**
@@ -245,5 +247,15 @@ class ExcelExportSheetItem<T> {
         } else {
             return sheetName;
         }
+    }
+
+    /**
+     * 结束当前创建的sheet页签对象的方法调用，返回导出者，继续后续导出操作
+     * （目前暂无实际业务场景，为未来扩展预留的方法）
+     *
+     * @return 导出者
+     */
+    public EE over() {
+        return excelExporter;
     }
 }
