@@ -1,7 +1,6 @@
 package com.thomas.alib.excel.exporter;
 
 import com.thomas.alib.excel.base.ExcelColumnRender;
-import com.thomas.alib.excel.converter.DefaultConverter;
 import com.thomas.alib.excel.loader.PictureLoader;
 import com.thomas.alib.excel.loader.PictureLoaderDefault;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
@@ -72,12 +71,7 @@ class ExcelExportColumnItem extends ExcelColumnRender implements Comparable<Exce
      */
     byte[] getColumnPictureBytesFromSource(Object source, int row_index) {
         try {
-            if (converter == null || converter instanceof DefaultConverter) {
-                //没配置转化器或是默认转化器，认为外部没有主动配置转化器，不需要转化，直接取出值传递给
-                return pictureLoader.insideLoad(columnField.get(source));
-            } else {
-                return pictureLoader.insideLoad(getColumnValueFromSource(source, row_index));
-            }
+            return pictureLoader.insideLoad(getColumnValueFromSource(source, row_index));
         } catch (Throwable e) {
             logger.error("表格\"" + headName + "\"列-第" + row_index + "行-加载图片时发生错误:", e);
             return null;
@@ -87,7 +81,7 @@ class ExcelExportColumnItem extends ExcelColumnRender implements Comparable<Exce
     /**
      * 从数据源中取出本列的值，方法中自动处理convert转化
      *
-     * @param source 数据源
+     * @param source    数据源
      * @param row_index 数据行序号，打印日志使用
      * @return 本列的值
      */

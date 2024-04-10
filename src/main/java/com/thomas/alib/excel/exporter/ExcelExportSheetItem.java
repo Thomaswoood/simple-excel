@@ -113,7 +113,6 @@ public class ExcelExportSheetItem<T, EE extends ExcelExporterBase<EE>> {
         }
         //表头样式处理
         ExcelExportStyleProcessor head_style_processor;
-
         //数据样式处理
         ExcelExportStyleProcessor data_style_processor;
         //表格sheet注解判空区分处理
