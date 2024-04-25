@@ -58,14 +58,8 @@ public class ExcelExport2JakartaResponse extends ExcelExporterBase<ExcelExport2J
             fileName = System.currentTimeMillis() + ".xlsx";
         }
         response.reset();
-        response.addHeader("Access-Control-Allow-Origin", "*");
-        response.addHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-        response.addHeader("Access-Control-Expose-Headers", "Content-Disposition");
         response.addHeader("Content-disposition", "attachment; filename=" + fileName);
-        response.addHeader("Access-Control-Allow-Credentials", "true");
-        response.addHeader("Access-Control-Allow-Headers", "access-control-allow-origin, authority, content-type, version-info, X-Requested-With, x-access-token");
-        response.addHeader("Access-Control-Max-Age", "3600");
-        response.setContentType("application/octet-stream");
+        response.setContentType("application/vnd.ms-excel;charset=utf-8");
         return response.getOutputStream();
     }
 
