@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -139,6 +138,8 @@ public class ExcelExportSheetItem<T, EE extends ExcelExporterBase<EE>> {
             data_style_processor = ExcelExportStyleProcessor.read(excel_sheet.baseStyle()).coverBySourceExceptNotSet(excel_sheet.dataStyle());
             sheetDataStyle = data_style_processor.createXSSFCellStyle(excelExporter.sxssfWorkbook);
         }
+        //根据解析信息创建excel数据
+        mySheet = excelExporter.sxssfWorkbook.createSheet(sheetName());//创建sheet对象
         //解析全部成员属性
         totalFieldList = ReflectUtil.getAccessibleFieldIncludeSuper(sheetDataClazz);//全部的成员列表
         excelColumnList = new ArrayList<>();//解析成员为excel列信息列表
@@ -148,15 +149,7 @@ public class ExcelExportSheetItem<T, EE extends ExcelExporterBase<EE>> {
                 excelColumnList.add(column);
         }
         //给列排序
-        switch (columnSortType) {
-            case B2S:
-                Collections.reverse(excelColumnList);
-            case S2B:
-            default:
-                Collections.sort(excelColumnList);
-        }
-        //根据解析信息创建excel数据
-        mySheet = excelExporter.sxssfWorkbook.createSheet(sheetName());//创建sheet对象
+        columnSortType.sort(excelColumnList);
     }
 
     /**
@@ -211,7 +204,7 @@ public class ExcelExportSheetItem<T, EE extends ExcelExporterBase<EE>> {
                             if (pictureBytes == null) {
                                 cell.setCellValue("图片： " + column.getColumnValueFromSource(item_source, row_index) + "  加载失败");
                             } else {
-                                Drawing drawing = mySheet.getDrawingPatriarch();
+                                Drawing<?> drawing = mySheet.getDrawingPatriarch();
                                 if (drawing == null) drawing = mySheet.createDrawingPatriarch();
                                 ClientAnchor clientAnchor = drawing.createAnchor(0, 0, 0, 0, r_i, row_index, r_i + 1, i + 2);
                                 int addPicture = excelExporter.sxssfWorkbook.addPicture(pictureBytes, SXSSFWorkbook.PICTURE_TYPE_JPEG);
