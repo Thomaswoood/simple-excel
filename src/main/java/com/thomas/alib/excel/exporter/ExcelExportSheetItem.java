@@ -153,35 +153,43 @@ public class ExcelExportSheetItem<T, EE extends ExcelExporterBase<EE>> {
     }
 
     /**
-     * 初始化sheet并设置数据到sheet中
+     * 写入表头行
      */
-    void writeData() {
-        logger.debug(sheetName() + "sheet页签准备处理数据");
+    private void writeHeadRow() {
+        //外部给每行操作的列计数，因为是否自动显示序号会影响起始位置
+        int row_column_index = 0;
         //创建并填充表头信息
         Row headRow = mySheet.createRow(0);//创建表头
         //设置表头行高
         if (headRowHeight > 0) headRow.setHeight(headRowHeight);
-        int r_i = 0;//外部给row计数，因为是否自动显示序号会影响起始位置
         if (showIndex) {//如果需要默认显示序号
-            Cell cell = headRow.createCell(r_i);
+            Cell cell = headRow.createCell(row_column_index);
             cell.setCellValue("序号");
             if (sheetHeadStyle != null) cell.setCellStyle(sheetHeadStyle);
-            mySheet.setColumnWidth(r_i, 3000);
-            r_i++;
+            mySheet.setColumnWidth(row_column_index, 3000);
+            row_column_index++;
         }
         for (ExcelExportColumnItem column : excelColumnList) {
-            Cell cell = headRow.createCell(r_i);
+            Cell cell = headRow.createCell(row_column_index);
             cell.setCellValue(column.getHeadName());
             if (column.getColumnHeadStyle() != null) {
                 cell.setCellStyle(column.getColumnHeadStyle());
             } else if (sheetHeadStyle != null) {
                 cell.setCellStyle(sheetHeadStyle);
             }
-            mySheet.setColumnWidth(r_i, column.getColumnWidth());
-            r_i++;
+            mySheet.setColumnWidth(row_column_index, column.getColumnWidth());
+            row_column_index++;
         }
         logger.debug("表头行处理完成");
+    }
+
+    /**
+     * 写入数据行
+     */
+    private void writeDataRow() {
         if (!CollectionUtils.isEmpty(sourceList)) {
+            //外部给每行操作的列计数，因为是否自动显示序号会影响起始位置
+            int row_column_index;
             //创建并填充每行数据信息
             for (int i = 0; i < sourceList.size(); i++) {//创建每一行数据
                 int row_index = i + 1;//行序号
@@ -189,15 +197,15 @@ public class ExcelExportSheetItem<T, EE extends ExcelExporterBase<EE>> {
                 Row dataRow = mySheet.createRow(row_index);//创建数据行
                 //设置数据行高
                 if (dataRowHeight > 0) dataRow.setHeight(dataRowHeight);
-                r_i = 0;//每新开始一行，重置row计数
+                row_column_index = 0;//每新开始一行，重置row计数
                 if (showIndex) {//如果需要默认显示序号
-                    Cell cell = dataRow.createCell(r_i);
+                    Cell cell = dataRow.createCell(row_column_index);
                     cell.setCellValue(row_index);
                     if (sheetDataStyle != null) cell.setCellStyle(sheetDataStyle);
-                    r_i++;
+                    row_column_index++;
                 }
                 for (ExcelExportColumnItem column : excelColumnList) {
-                    Cell cell = dataRow.createCell(r_i);
+                    Cell cell = dataRow.createCell(row_column_index);
                     if (column.isPicture()) {
                         try {
                             byte[] pictureBytes = column.getColumnPictureBytesFromSource(item_source, row_index);
@@ -206,7 +214,7 @@ public class ExcelExportSheetItem<T, EE extends ExcelExporterBase<EE>> {
                             } else {
                                 Drawing<?> drawing = mySheet.getDrawingPatriarch();
                                 if (drawing == null) drawing = mySheet.createDrawingPatriarch();
-                                ClientAnchor clientAnchor = drawing.createAnchor(0, 0, 0, 0, r_i, row_index, r_i + 1, i + 2);
+                                ClientAnchor clientAnchor = drawing.createAnchor(0, 0, 0, 0, row_column_index, row_index, row_column_index + 1, i + 2);
                                 int addPicture = excelExporter.sxssfWorkbook.addPicture(pictureBytes, SXSSFWorkbook.PICTURE_TYPE_JPEG);
                                 Picture picture = drawing.createPicture(clientAnchor, addPicture);
                                 picture.getPictureData();
@@ -223,12 +231,21 @@ public class ExcelExportSheetItem<T, EE extends ExcelExporterBase<EE>> {
                     } else if (sheetDataStyle != null) {
                         cell.setCellStyle(sheetDataStyle);
                     }
-                    r_i++;
+                    row_column_index++;
                 }
                 logger.debug("表格第" + row_index + "行处理完成");
             }
         }
         logger.debug("数据行处理完成");
+    }
+
+    /**
+     * 初始化sheet并设置数据到sheet中
+     */
+    void writeData() {
+        logger.debug(sheetName() + "sheet页签准备处理数据");
+        writeHeadRow();
+        writeDataRow();
         logger.debug(sheetName() + "sheet页签数据处理完成");
     }
 
