@@ -186,11 +186,12 @@ class ExcelExportStyleProcessor {
     }
 
     /**
-     * 根据workbook初始化样式
+     * 根据workbook创建Excel样式对象
      *
      * @param sxssfWorkbook excel导出构建对象
+     * @return Excel样式对象
      */
-    XSSFCellStyle getXSSFCellStyle(SXSSFWorkbook sxssfWorkbook) {
+    XSSFCellStyle createXSSFCellStyle(SXSSFWorkbook sxssfWorkbook) {
         //根据配置数据初始化样式
         XSSFCellStyle xssf_cell_style = (XSSFCellStyle) sxssfWorkbook.createCellStyle();
         //设置字体样式

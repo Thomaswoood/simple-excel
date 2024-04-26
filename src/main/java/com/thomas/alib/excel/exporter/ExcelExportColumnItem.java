@@ -33,11 +33,11 @@ class ExcelExportColumnItem extends ExcelColumnRender implements Comparable<Exce
         if (isValid) {
             if (ExcelExportStyleProcessor.hadSet(excelColumn.columnStyle())) {
                 //数据样式处理
-                dataStyle = data_style_processor.coverBySourceExceptNotSetInNew(excelColumn.columnStyle()).getXSSFCellStyle(sxssf_workbook);
+                dataStyle = data_style_processor.coverBySourceExceptNotSetInNew(excelColumn.columnStyle()).createXSSFCellStyle(sxssf_workbook);
                 //判断列样式是否影响表头
                 if (excelColumn.columnStyleInHead()) {
                     //表头样式处理
-                    headStyle = head_style_processor.coverBySourceExceptNotSetInNew(excelColumn.columnStyle()).getXSSFCellStyle(sxssf_workbook);
+                    headStyle = head_style_processor.coverBySourceExceptNotSetInNew(excelColumn.columnStyle()).createXSSFCellStyle(sxssf_workbook);
                 }
             }
             //判断是否按图片处理，按图片处理导出时，需要初始化图片加载器

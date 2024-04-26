@@ -130,10 +130,10 @@ public class ExcelExportSheetItem<T, EE extends ExcelExporterBase<EE>> {
             dataRowHeight = excel_sheet.dataRowHeight();//数据行高度
             //读取表头行样式
             head_style_processor = ExcelExportStyleProcessor.read(excel_sheet.baseStyle()).coverBySourceExceptNotSet(excel_sheet.headStyle());
-            headStyle = head_style_processor.getXSSFCellStyle(excelExporter.sxssfWorkbook);
+            headStyle = head_style_processor.createXSSFCellStyle(excelExporter.sxssfWorkbook);
             //读取数据行样式
             data_style_processor = ExcelExportStyleProcessor.read(excel_sheet.baseStyle()).coverBySourceExceptNotSet(excel_sheet.dataStyle());
-            dataStyle = data_style_processor.getXSSFCellStyle(excelExporter.sxssfWorkbook);
+            dataStyle = data_style_processor.createXSSFCellStyle(excelExporter.sxssfWorkbook);
         }
         //解析全部成员属性
         totalFieldList = ReflectUtil.getAccessibleFieldIncludeSuper(sheetDataClazz);//全部的成员列表
