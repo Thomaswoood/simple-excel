@@ -20,24 +20,24 @@ class ExcelExportColumnItem extends ExcelColumnRender implements Comparable<Exce
      */
     protected PictureLoader<?> pictureLoader;
     /**
-     * 表头行样式
+     * 列定制表头行样式，无特殊定制时为空
      */
-    private XSSFCellStyle headStyle;
+    private XSSFCellStyle columnHeadStyle;
     /**
-     * 数据行样式
+     * 列定制数据行样式，无特殊定制时为空
      */
-    private XSSFCellStyle dataStyle;
+    private XSSFCellStyle columnDataStyle;
 
     ExcelExportColumnItem(Field field, SXSSFWorkbook sxssf_workbook, ExcelExportStyleProcessor head_style_processor, ExcelExportStyleProcessor data_style_processor) {
         super(field);
         if (isValid) {
             if (ExcelExportStyleProcessor.hadSet(excelColumn.columnStyle())) {
                 //数据样式处理
-                dataStyle = data_style_processor.coverBySourceExceptNotSetInNew(excelColumn.columnStyle()).createXSSFCellStyle(sxssf_workbook);
+                columnDataStyle = data_style_processor.coverBySourceExceptNotSetInNew(excelColumn.columnStyle()).createXSSFCellStyle(sxssf_workbook);
                 //判断列样式是否影响表头
                 if (excelColumn.columnStyleInHead()) {
                     //表头样式处理
-                    headStyle = head_style_processor.coverBySourceExceptNotSetInNew(excelColumn.columnStyle()).createXSSFCellStyle(sxssf_workbook);
+                    columnHeadStyle = head_style_processor.coverBySourceExceptNotSetInNew(excelColumn.columnStyle()).createXSSFCellStyle(sxssf_workbook);
                 }
             }
             //判断是否按图片处理，按图片处理导出时，需要初始化图片加载器
@@ -98,12 +98,12 @@ class ExcelExportColumnItem extends ExcelColumnRender implements Comparable<Exce
         }
     }
 
-    public XSSFCellStyle getHeadStyle() {
-        return headStyle;
+    public XSSFCellStyle getColumnHeadStyle() {
+        return columnHeadStyle;
     }
 
-    public XSSFCellStyle getDataStyle() {
-        return dataStyle;
+    public XSSFCellStyle getColumnDataStyle() {
+        return columnDataStyle;
     }
 
     /**
