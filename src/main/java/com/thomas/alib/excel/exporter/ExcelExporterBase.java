@@ -34,123 +34,125 @@ public abstract class ExcelExporterBase<C extends ExcelExporterBase<C>> {
     /**
      * 添加一个列表，作为一个sheet
      *
-     * @param dataList 数据源列表
-     * @param <T>      数据类型泛型
+     * @param data_list 数据源列表
+     * @param <T>       数据类型泛型
      * @return 链式调用，返回自身
      */
-    public <T> C addSheet(List<T> dataList) {
-        return addSheet(dataList, null);
+    public <T> C addSheet(List<T> data_list) {
+        return addSheet(data_list, null);
     }
 
     /**
      * 添加一个列表，作为一个sheet
      *
-     * @param dataList   数据源列表
+     * @param data_list  数据源列表
      * @param show_index 是否显示序号
      * @param <T>        数据类型泛型
      * @return 链式调用，返回自身
      */
-    public <T> C addSheet(List<T> dataList, Boolean show_index) {
-        return addSheet(dataList, show_index, null);
+    public <T> C addSheet(List<T> data_list, Boolean show_index) {
+        return addSheet(data_list, show_index, null);
     }
 
     /**
      * 添加一个列表，作为一个sheet
      *
-     * @param dataList   数据源列表
+     * @param data_list  数据源列表
      * @param show_index 是否显示序号
      * @param sheet_name 指定sheet名称
      * @param <T>        数据类型泛型
      * @return 链式调用，返回自身
      */
-    public <T> C addSheet(List<T> dataList, Boolean show_index, String sheet_name) {
+    public <T> C addSheet(List<T> data_list, Boolean show_index, String sheet_name) {
         //空数据不操作
-        if (CollectionUtils.isEmpty(dataList)) return child;
+        if (CollectionUtils.isEmpty(data_list)) return child;
         //获取数据类型
-        Class<T> dataClazz = null;
-        try {
-            for (T item : dataList) {
-                dataClazz = (Class<T>) item.getClass();
-                if (dataClazz != null) break;
+        Class<T> data_clazz = null;
+        for (T item : data_list) {
+            if (item != null) {
+                try {
+                    data_clazz = (Class<T>) item.getClass();
+                    break;
+                } catch (Throwable ignored) {
+                }
             }
-        } catch (Throwable ignored) {
         }
-        return createSheet(dataList, dataClazz, show_index, sheet_name);
+        return createSheet(data_list, data_clazz, show_index, sheet_name);
     }
 
     /**
      * 添加一个仅有表头的空sheet
      *
-     * @param dataClazz 数据源类型
-     * @param <T>       数据类型泛型
+     * @param data_clazz 数据源类型
+     * @param <T>        数据类型泛型
      * @return 链式调用，返回自身
      */
-    public <T> C createEmptySheet(Class<T> dataClazz) {
-        return createSheet(null, dataClazz);
+    public <T> C createEmptySheet(Class<T> data_clazz) {
+        return createSheet(null, data_clazz);
     }
 
     /**
      * 添加一个仅有表头的空sheet
      *
-     * @param dataClazz  数据源类型
+     * @param data_clazz 数据源类型
      * @param show_index 是否显示序号
      * @param <T>        数据类型泛型
      * @return 链式调用，返回自身
      */
-    public <T> C createEmptySheet(Class<T> dataClazz, Boolean show_index) {
-        return createSheet(null, dataClazz, show_index);
+    public <T> C createEmptySheet(Class<T> data_clazz, Boolean show_index) {
+        return createSheet(null, data_clazz, show_index);
     }
 
     /**
      * 添加一个仅有表头的空sheet
      *
-     * @param dataClazz  数据源类型
+     * @param data_clazz 数据源类型
      * @param show_index 是否显示序号
      * @param sheet_name 指定sheet名称
      * @param <T>        数据类型泛型
      * @return 链式调用，返回自身
      */
-    public <T> C createEmptySheet(Class<T> dataClazz, Boolean show_index, String sheet_name) {
-        return createSheet(null, dataClazz, show_index, sheet_name);
+    public <T> C createEmptySheet(Class<T> data_clazz, Boolean show_index, String sheet_name) {
+        return createSheet(null, data_clazz, show_index, sheet_name);
     }
 
     /**
      * 添加一个列表，作为一个sheet
      *
-     * @param dataList  数据源列表
-     * @param dataClazz 数据源类型
-     * @param <T>       数据类型泛型
+     * @param data_list  数据源列表
+     * @param data_clazz 数据源类型
+     * @param <T>        数据类型泛型
      * @return 链式调用，返回自身
      */
-    public <T> C createSheet(List<T> dataList, Class<T> dataClazz) {
-        return createSheet(dataList, dataClazz, null);
+    public <T> C createSheet(List<T> data_list, Class<T> data_clazz) {
+        return createSheet(data_list, data_clazz, null);
     }
 
     /**
      * 添加一个列表，作为一个sheet
      *
-     * @param dataList   数据源列表
-     * @param dataClazz  数据源类型
+     * @param data_list  数据源列表
+     * @param data_clazz 数据源类型
      * @param show_index 是否显示序号
      * @param <T>        数据类型泛型
      * @return 链式调用，返回自身
      */
-    public <T> C createSheet(List<T> dataList, Class<T> dataClazz, Boolean show_index) {
-        return createSheet(dataList, dataClazz, show_index, null);
+    public <T> C createSheet(List<T> data_list, Class<T> data_clazz, Boolean show_index) {
+        return createSheet(data_list, data_clazz, show_index, null);
     }
 
     /**
      * 添加一个列表，作为一个sheet
      *
-     * @param dataList   数据源列表
-     * @param dataClazz  数据源类型
+     * @param data_list  数据源列表
+     * @param data_clazz 数据源类型
      * @param show_index 是否显示序号
      * @param sheet_name 指定sheet名称
      * @param <T>        数据类型泛型
      * @return 链式调用，返回自身
      */
-    public <T> C createSheet(List<T> dataList, Class<T> dataClazz, Boolean show_index, String sheet_name) {
-        currentSheetItem = new ExcelExportSheetItem<>(child, dataList, dataClazz, show_index, sheet_name);
+    public <T> C createSheet(List<T> data_list, Class<T> data_clazz, Boolean show_index, String sheet_name) {
+        currentSheetItem = new ExcelExportSheetItem<>(child, data_list, data_clazz, show_index, sheet_name);
         currentSheetItem.writeData();
         sheetItemList.add(currentSheetItem);
         return child;
@@ -184,9 +186,9 @@ public abstract class ExcelExporterBase<C extends ExcelExporterBase<C>> {
     /**
      * 开始生成并输出返回
      *
-     * @param autoDestroy 是否自动销毁
+     * @param auto_destroy 是否自动销毁
      */
-    public void export(boolean autoDestroy) {
+    public void export(boolean auto_destroy) {
         if (CollectionUtils.isEmpty(sheetItemList))
             throw new RuntimeException("导出数据为空");
         logger.debug("导出数据处理完毕，开始输出到指定的流中。");
@@ -205,7 +207,7 @@ public abstract class ExcelExporterBase<C extends ExcelExporterBase<C>> {
             } catch (IOException e) {
                 logger.error("表格export关闭输出流时发生错误:", e);
             }
-            if (autoDestroy) destroy();
+            if (auto_destroy) destroy();
             logger.debug("导出数据输出完毕。");
         }
     }
