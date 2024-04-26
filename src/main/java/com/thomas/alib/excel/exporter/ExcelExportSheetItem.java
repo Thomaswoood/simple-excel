@@ -73,6 +73,10 @@ public class ExcelExportSheetItem<T, EE extends ExcelExporterBase<EE>> {
      * 全部的成员对应的excel列信息列表
      */
     private List<ExcelExportColumnItem> excelColumnList;
+    /**
+     * 本sheet页对象
+     */
+    Sheet mySheet;
 
     /**
      * 构造方法
@@ -151,6 +155,8 @@ public class ExcelExportSheetItem<T, EE extends ExcelExporterBase<EE>> {
             default:
                 Collections.sort(excelColumnList);
         }
+        //根据解析信息创建excel数据
+        mySheet = excelExporter.sxssfWorkbook.createSheet(sheetName());//创建sheet对象
     }
 
     /**
@@ -158,10 +164,8 @@ public class ExcelExportSheetItem<T, EE extends ExcelExporterBase<EE>> {
      */
     void writeData() {
         logger.debug(sheetName() + "sheet页签准备处理数据");
-        //根据解析信息创建excel数据
-        Sheet sheet = excelExporter.sxssfWorkbook.createSheet(sheetName());//创建sheet对象
         //创建并填充表头信息
-        Row headRow = sheet.createRow(0);//创建表头
+        Row headRow = mySheet.createRow(0);//创建表头
         //设置表头行高
         if (headRowHeight > 0) headRow.setHeight(headRowHeight);
         int r_i = 0;//外部给row计数，因为是否自动显示序号会影响起始位置
@@ -169,7 +173,7 @@ public class ExcelExportSheetItem<T, EE extends ExcelExporterBase<EE>> {
             Cell cell = headRow.createCell(r_i);
             cell.setCellValue("序号");
             if (sheetHeadStyle != null) cell.setCellStyle(sheetHeadStyle);
-            sheet.setColumnWidth(r_i, 3000);
+            mySheet.setColumnWidth(r_i, 3000);
             r_i++;
         }
         for (ExcelExportColumnItem column : excelColumnList) {
@@ -180,7 +184,7 @@ public class ExcelExportSheetItem<T, EE extends ExcelExporterBase<EE>> {
             } else if (sheetHeadStyle != null) {
                 cell.setCellStyle(sheetHeadStyle);
             }
-            sheet.setColumnWidth(r_i, column.getColumnWidth());
+            mySheet.setColumnWidth(r_i, column.getColumnWidth());
             r_i++;
         }
         logger.debug("表头行处理完成");
@@ -189,7 +193,7 @@ public class ExcelExportSheetItem<T, EE extends ExcelExporterBase<EE>> {
             for (int i = 0; i < sourceList.size(); i++) {//创建每一行数据
                 int row_index = i + 1;//行序号
                 T item_source = sourceList.get(i);//逐个取出数据源
-                Row dataRow = sheet.createRow(row_index);//创建数据行
+                Row dataRow = mySheet.createRow(row_index);//创建数据行
                 //设置数据行高
                 if (dataRowHeight > 0) dataRow.setHeight(dataRowHeight);
                 r_i = 0;//每新开始一行，重置row计数
@@ -207,8 +211,8 @@ public class ExcelExportSheetItem<T, EE extends ExcelExporterBase<EE>> {
                             if (pictureBytes == null) {
                                 cell.setCellValue("图片： " + column.getColumnValueFromSource(item_source, row_index) + "  加载失败");
                             } else {
-                                Drawing drawing = sheet.getDrawingPatriarch();
-                                if (drawing == null) drawing = sheet.createDrawingPatriarch();
+                                Drawing drawing = mySheet.getDrawingPatriarch();
+                                if (drawing == null) drawing = mySheet.createDrawingPatriarch();
                                 ClientAnchor clientAnchor = drawing.createAnchor(0, 0, 0, 0, r_i, row_index, r_i + 1, i + 2);
                                 int addPicture = excelExporter.sxssfWorkbook.addPicture(pictureBytes, SXSSFWorkbook.PICTURE_TYPE_JPEG);
                                 Picture picture = drawing.createPicture(clientAnchor, addPicture);
