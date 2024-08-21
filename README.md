@@ -27,7 +27,7 @@
 <dependency>
     <groupId>io.github.Thomaswoood</groupId>
     <artifactId>simple-excel</artifactId>
-    <version>2.1.2</version>
+    <version>2.1.3</version>
 </dependency>
 <!--需要引入apache-poi 支持4.1.2至5.2.5版本-->
 <dependency>
