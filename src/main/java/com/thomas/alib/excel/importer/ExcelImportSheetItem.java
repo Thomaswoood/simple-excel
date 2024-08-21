@@ -1,5 +1,6 @@
 package com.thomas.alib.excel.importer;
 
+import com.thomas.alib.excel.base.ExcelColumnRender;
 import com.thomas.alib.excel.exception.AnalysisException;
 import com.thomas.alib.excel.importer.validation.ImportValidator;
 import com.thomas.alib.excel.importer.validation.ImportValidatorFactory;
@@ -22,7 +23,7 @@ import java.util.function.Consumer;
  * @param <T> 数据源对象类型泛型
  */
 class ExcelImportSheetItem<T> implements AutoCloseable {
-    private static Logger logger = LoggerFactory.getLogger(ExcelImportSheetItem.class);
+    private static final Logger logger = LoggerFactory.getLogger(ExcelImportSheetItem.class);
     /**
      * excel工作簿对象
      */
@@ -239,6 +240,16 @@ class ExcelImportSheetItem<T> implements AutoCloseable {
      */
     @Override
     public void close() {
+        mWorkbook = null;
+        formulaEvaluator = null;
+        mSheet = null;
+        dataClazz = null;
+        if (columnFieldItemMap != null) {
+            columnFieldItemMap.values().forEach(ExcelColumnRender::close);
+            columnFieldItemMap.clear();
+        }
+        columnFieldItemMap = null;
+        lineCount = 0;
         //如果验证器存在，关闭他
         if (importValidator != null) {
             try {
@@ -246,6 +257,7 @@ class ExcelImportSheetItem<T> implements AutoCloseable {
             } catch (Throwable e) {
                 logger.error("验证器工厂关闭时发生错误:", e);
             }
+            importValidator = null;
         }
     }
 }

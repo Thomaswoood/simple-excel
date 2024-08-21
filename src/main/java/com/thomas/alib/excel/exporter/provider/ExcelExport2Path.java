@@ -15,7 +15,7 @@ import java.nio.file.Paths;
  * Excel导出者：针对基于Path直接导出为文件的版本，主要负责处理Path对象和文件输出流的交互
  */
 public class ExcelExport2Path extends ExcelExporterBase<ExcelExport2Path> {
-    protected static Logger logger = LoggerFactory.getLogger(ExcelExport2Path.class);
+    protected static final Logger logger = LoggerFactory.getLogger(ExcelExport2Path.class);
     protected Path path;
 
     /**

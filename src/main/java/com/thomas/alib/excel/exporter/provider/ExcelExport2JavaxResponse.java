@@ -13,7 +13,7 @@ import java.io.OutputStream;
  * Excel导出者：针对http请求的response版本，主要负责处理response类和输出流的交互
  */
 public class ExcelExport2JavaxResponse extends ExcelExporterBase<ExcelExport2JavaxResponse> {
-    protected static Logger logger = LoggerFactory.getLogger(ExcelExport2JavaxResponse.class);
+    protected static final Logger logger = LoggerFactory.getLogger(ExcelExport2JavaxResponse.class);
     /**
      * 导出到response中时，在返回头中的文件名
      */

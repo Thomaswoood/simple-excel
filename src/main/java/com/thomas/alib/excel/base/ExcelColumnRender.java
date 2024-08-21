@@ -11,8 +11,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 
-public class ExcelColumnRender {
-    private static Logger logger = LoggerFactory.getLogger(ExcelColumnRender.class);
+public class ExcelColumnRender implements AutoCloseable {
+    private static final Logger logger = LoggerFactory.getLogger(ExcelColumnRender.class);
     /**
      * 列属性信息
      */
@@ -157,5 +157,21 @@ public class ExcelColumnRender {
      */
     public void setColumnIndex(int columnIndex) {
         this.columnIndex = columnIndex;
+    }
+
+    @Override
+    public void close() {
+        columnField = null;
+        columnClass = null;
+        excelColumn = null;
+        isValid = false;
+        headName = null;
+        orderNum = 0;
+        prefix = null;
+        suffix = null;
+        columnWidth = 0;
+        converter = null;
+        isPicture = false;
+        columnIndex = 0;
     }
 }

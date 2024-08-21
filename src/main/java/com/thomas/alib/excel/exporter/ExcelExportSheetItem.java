@@ -20,8 +20,8 @@ import java.util.List;
  *
  * @param <T> 数据源对象类型泛型
  */
-public class ExcelExportSheetItem<T, EE extends ExcelExporterBase<EE>> {
-    private static Logger logger = LoggerFactory.getLogger(ExcelExportSheetItem.class);
+public class ExcelExportSheetItem<T, EE extends ExcelExporterBase<EE>> implements AutoCloseable {
+    private static final Logger logger = LoggerFactory.getLogger(ExcelExportSheetItem.class);
     /**
      * excel导出构建对象
      */
@@ -270,5 +270,32 @@ public class ExcelExportSheetItem<T, EE extends ExcelExporterBase<EE>> {
      */
     public EE over() {
         return excelExporter;
+    }
+
+    /**
+     * 关闭，目前用于清空所有对象引用，防止内存泄漏
+     */
+    @Override
+    public void close() {
+        excelExporter = null;
+        sourceList = null;
+        sheetDataClazz = null;
+        sheetName = null;
+        showIndex = false;
+        columnSortType = null;
+        headRowHeight = -1;
+        dataRowHeight = -1;
+        sheetHeadStyle = null;
+        sheetDataStyle = null;
+        if (totalFieldList != null) {
+            totalFieldList.clear();
+        }
+        totalFieldList = null;
+        if (excelColumnList != null) {
+            excelColumnList.forEach(ExcelExportColumnItem::close);
+            excelColumnList.clear();
+        }
+        excelColumnList = null;
+        mySheet = null;
     }
 }

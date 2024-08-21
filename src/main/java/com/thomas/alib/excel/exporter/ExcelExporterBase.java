@@ -222,6 +222,7 @@ public abstract class ExcelExporterBase<C extends ExcelExporterBase<C>> {
             logger.error("表格关闭Workbook时发生错误:", e);
         }
         sxssfWorkbook = null;
+        sheetItemList.forEach(ExcelExportSheetItem::close);
         sheetItemList.clear();
         sheetItemList = null;
         currentSheetItem = null;

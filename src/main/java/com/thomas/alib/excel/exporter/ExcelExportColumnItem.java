@@ -14,7 +14,7 @@ import java.lang.reflect.Field;
  * Excel导出对应每个列(Column)的解析工具
  */
 class ExcelExportColumnItem extends ExcelColumnRender implements Comparable<ExcelExportColumnItem> {
-    private static Logger logger = LoggerFactory.getLogger(ExcelExportColumnItem.class);
+    private static final Logger logger = LoggerFactory.getLogger(ExcelExportColumnItem.class);
     /**
      * 图片加载器
      */
@@ -112,5 +112,13 @@ class ExcelExportColumnItem extends ExcelColumnRender implements Comparable<Exce
     @Override
     public int compareTo(ExcelExportColumnItem o) {
         return this.orderNum - o.orderNum;
+    }
+
+    @Override
+    public void close() {
+        super.close();
+        pictureLoader = null;
+        columnHeadStyle = null;
+        columnDataStyle = null;
     }
 }

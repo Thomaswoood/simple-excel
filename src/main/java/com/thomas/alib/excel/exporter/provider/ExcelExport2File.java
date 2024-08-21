@@ -13,7 +13,7 @@ import java.io.OutputStream;
  * Excel导出者：针对直接导出为File文件的版本，主要负责处理File类和输出流的交互
  */
 public class ExcelExport2File extends ExcelExporterBase<ExcelExport2File> {
-    protected static Logger logger = LoggerFactory.getLogger(ExcelExport2File.class);
+    protected static final Logger logger = LoggerFactory.getLogger(ExcelExport2File.class);
     protected File file;
 
     /**
